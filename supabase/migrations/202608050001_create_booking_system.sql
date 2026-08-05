@@ -17,6 +17,7 @@ create table if not exists public.bookings (
 );
 
 create unique index if not exists bookings_one_active_slot on public.bookings (booking_date, booking_time) where status = 'confirmed';
+create index if not exists bookings_service_id_idx on public.bookings (service_id);
 alter table public.services enable row level security;
 alter table public.bookings enable row level security;
 
