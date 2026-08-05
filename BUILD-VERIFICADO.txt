@@ -1,0 +1,18 @@
+D.BarberShop — validação do projeto Next.js 16
+
+Data: 04/08/2026
+Node.js mínimo: 20.9.0
+Framework: Next.js 16.2.6
+
+Comandos validados:
+- npm run lint
+- npm run build
+
+Resultado:
+- Compilação concluída com sucesso.
+- TypeScript concluído com sucesso.
+- Rotas /, /servicos e /trabalhos geradas como páginas estáticas.
+- Pasta .next gerada corretamente.
+- Vinext, Vite, Wrangler e dependências da Cloudflare ausentes.
+
+Observação: a pasta .next não acompanha o ZIP porque é um artefato gerado. A Vercel cria essa pasta automaticamente ao executar npm run build.
