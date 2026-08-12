@@ -525,3 +525,29 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   .calendar-header strong span{font-size:10px}
   .calendar-legend{display:none}
 }
+
+
+/* Proportional service selector in booking flow */
+.booking-modal select{
+  height:64px;
+  padding:0 20px;
+  color:var(--white);
+  font-size:16px;
+  font-weight:600;
+  line-height:1;
+  letter-spacing:0;
+  text-transform:none;
+  border-color:rgba(208,180,120,.42);
+}
+.booking-modal select:focus{
+  outline:none;
+  border-color:var(--gold-light);
+  box-shadow:0 0 0 1px rgba(208,180,120,.18);
+}
+@media(max-width:800px){
+  .booking-modal select{
+    height:60px;
+    padding:0 16px;
+    font-size:15px;
+  }
+}
