@@ -6,6 +6,8 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock3,
+  ExternalLink,
+  LayoutDashboard,
   LoaderCircle,
   LockKeyhole,
   LogOut,
@@ -138,46 +140,68 @@ export default function BarberDashboard() {
 
   return (
     <main className="barber-dashboard">
-      <header className="barber-header">
-        <a href="/" className="barber-wordmark">D.BARBERSHOP</a>
-        <div><span>Área do barbeiro</span><button onClick={logout} aria-label="Sair"><LogOut size={18} /> Sair</button></div>
-      </header>
-      <div className="barber-content">
-        <section className="barber-heading">
-          <div><p className="barber-kicker">CONTROLE DE ATENDIMENTOS</p><h1>Sua agenda.</h1><p>Os novos agendamentos feitos no site aparecem aqui automaticamente.</p></div>
-          <label className="barber-date"><CalendarDays size={18} /><span>Data</span><input type="date" value={date} onChange={event => setDate(event.target.value)} /></label>
-        </section>
-        <section className="barber-stats">
-          <article><span>Horários</span><strong>{summary.total}</strong></article>
-          <article><span>Confirmados</span><strong>{summary.confirmed}</strong></article>
-          <article><span>Concluídos</span><strong>{summary.completed}</strong></article>
-        </section>
-        <section className="barber-agenda">
-          <div className="barber-agenda-title"><div><p className="barber-kicker">AGENDA DO DIA</p><h2>{new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}</h2></div><button onClick={() => loadBookings(date)} aria-label="Atualizar agenda"><RefreshCw className={loading ? "spin" : ""} size={18} /> Atualizar</button></div>
-          {message && <p className="barber-error" role="alert">{message}</p>}
-          {loading ? <div className="barber-empty"><LoaderCircle className="spin" /><p>Carregando horários...</p></div> :
-          bookings.length === 0 ? <div className="barber-empty"><CalendarDays /><h3>Nenhum horário nesta data.</h3><p>Quando um cliente agendar pelo site, o atendimento aparecerá aqui.</p></div> :
-          <div className="barber-booking-list">{bookings.map(booking => (
-            <article className={`barber-booking ${booking.status}`} key={booking.id}>
-              <div className="barber-time"><Clock3 size={18} /><strong>{booking.booking_time.slice(0, 5)}</strong></div>
-              <div className="barber-booking-info">
-                <div><span className={`barber-status ${booking.status}`}>{statusLabel[booking.status]}</span><h3>{booking.customer_name}</h3></div>
-                <ul>
-                  <li><Scissors size={16} />{booking.services?.name ?? "Serviço"}</li>
-                  <li><Clock3 size={16} />{booking.services?.duration_minutes ?? 0} minutos</li>
-                  <li><Phone size={16} /><a href={`tel:${booking.customer_phone.replace(/\D/g, "")}`}>{booking.customer_phone}</a></li>
-                </ul>
-              </div>
-              <div className="barber-actions">
-                {booking.status !== "completed" && <button className="complete" onClick={() => updateStatus(booking.id, "completed")}><CheckCircle2 size={17} /> Concluir</button>}
-                {booking.status !== "cancelled" && <button onClick={() => updateStatus(booking.id, "cancelled")}><XCircle size={17} /> Cancelar</button>}
-                {booking.status !== "confirmed" && <button onClick={() => updateStatus(booking.id, "confirmed")}><UserRound size={17} /> Reabrir</button>}
-              </div>
-            </article>
-          ))}</div>}
-        </section>
+      <aside className="barber-sidebar">
+        <div className="barber-signature">
+          <span className="barber-signature-mark">D</span>
+          <span><strong>D.BARBER</strong><small>STUDIO CONTROL</small></span>
+        </div>
+        <nav aria-label="Navegação do painel">
+          <span className="barber-nav-label">GESTÃO</span>
+          <button className="active" type="button"><LayoutDashboard size={18} /><span>Agenda</span></button>
+        </nav>
+        <div className="barber-sidebar-foot">
+          <a href="/" target="_blank"><ExternalLink size={17} /><span>Ver site</span></a>
+          <button onClick={logout} aria-label="Sair"><LogOut size={17} /><span>Sair</span></button>
+        </div>
+      </aside>
+
+      <div className="barber-workspace">
+        <header className="barber-header">
+          <div>
+            <span className="barber-live"><i /> PAINEL ONLINE</span>
+            <small>Área exclusiva do profissional</small>
+          </div>
+          <label className="barber-date"><CalendarDays size={17} /><span>Selecionar data</span><input type="date" value={date} onChange={event => setDate(event.target.value)} /></label>
+        </header>
+
+        <div className="barber-content">
+          <section className="barber-heading">
+            <div><p className="barber-kicker">VISÃO DO DIA</p><h1>Agenda de trabalho.</h1><p>Acompanhe cada atendimento do dia em um só lugar.</p></div>
+            <span className="barber-day-number">{new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", { day: "2-digit" })}<small>{new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}</small></span>
+          </section>
+
+          <section className="barber-stats" aria-label="Resumo do dia">
+            <article><span><small>01</small>Horários</span><strong>{summary.total.toString().padStart(2, "0")}</strong></article>
+            <article><span><small>02</small>Confirmados</span><strong>{summary.confirmed.toString().padStart(2, "0")}</strong></article>
+            <article><span><small>03</small>Concluídos</span><strong>{summary.completed.toString().padStart(2, "0")}</strong></article>
+          </section>
+
+          <section className="barber-agenda">
+            <div className="barber-agenda-title"><div><p className="barber-kicker">ROTEIRO DE ATENDIMENTOS</p><h2>{new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}</h2></div><button onClick={() => loadBookings(date)} aria-label="Atualizar agenda"><RefreshCw className={loading ? "spin" : ""} size={18} /> Atualizar</button></div>
+            {message && <p className="barber-error" role="alert">{message}</p>}
+            {loading ? <div className="barber-empty"><LoaderCircle className="spin" /><p>Carregando horários...</p></div> :
+            bookings.length === 0 ? <div className="barber-empty"><CalendarDays /><h3>Agenda livre nesta data.</h3><p>Os próximos agendamentos realizados no site aparecerão aqui automaticamente.</p></div> :
+            <div className="barber-booking-list">{bookings.map(booking => (
+              <article className={`barber-booking ${booking.status}`} key={booking.id}>
+                <div className="barber-time"><span>HORÁRIO</span><strong>{booking.booking_time.slice(0, 5)}</strong></div>
+                <div className="barber-booking-info">
+                  <div><span className={`barber-status ${booking.status}`}>{statusLabel[booking.status]}</span><h3>{booking.customer_name}</h3></div>
+                  <ul>
+                    <li><Scissors size={16} />{booking.services?.name ?? "Serviço"}</li>
+                    <li><Clock3 size={16} />{booking.services?.duration_minutes ?? 0} minutos</li>
+                    <li><Phone size={16} /><a href={`tel:${booking.customer_phone.replace(/\D/g, "")}`}>{booking.customer_phone}</a></li>
+                  </ul>
+                </div>
+                <div className="barber-actions">
+                  {booking.status !== "completed" && <button className="complete" onClick={() => updateStatus(booking.id, "completed")}><CheckCircle2 size={17} /> Concluir</button>}
+                  {booking.status !== "cancelled" && <button onClick={() => updateStatus(booking.id, "cancelled")}><XCircle size={17} /> Cancelar</button>}
+                  {booking.status !== "confirmed" && <button onClick={() => updateStatus(booking.id, "confirmed")}><UserRound size={17} /> Reabrir</button>}
+                </div>
+              </article>
+            ))}</div>}
+          </section>
+        </div>
       </div>
     </main>
   );
 }
-
