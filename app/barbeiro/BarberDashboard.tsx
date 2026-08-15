@@ -2,206 +2,62 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft,
-  CalendarDays,
-  CheckCircle2,
-  Clock3,
-  ExternalLink,
-  LayoutDashboard,
-  LoaderCircle,
-  LockKeyhole,
-  LogOut,
-  Phone,
-  RefreshCw,
-  Scissors,
-  UserRound,
-  XCircle,
+  ArrowLeft, CalendarDays, CheckCircle2, Clock3, ExternalLink, LayoutDashboard,
+  LoaderCircle, LockKeyhole, LogOut, Phone, RefreshCw, Save, Scissors, Search,
+  UserRound, Users, UserX, XCircle,
 } from "lucide-react";
 
-type Booking = {
-  id: string;
-  customer_name: string;
-  customer_phone: string;
-  booking_date: string;
-  booking_time: string;
-  status: "confirmed" | "completed" | "cancelled";
-  services: { name: string; duration_minutes: number } | null;
-};
+type BookingStatus = "confirmed" | "completed" | "cancelled" | "no_show";
+type Booking = { id:string; customer_name:string; customer_phone:string; booking_date:string; booking_time:string; status:BookingStatus; services:{name:string;duration_minutes:number}|null };
+type CustomerBooking = { id:string; booking_date:string; booking_time:string; status:BookingStatus; services:{name:string}|null };
+type Customer = { id:string; name:string; phone:string; notes:string; created_at:string; updated_at:string; bookings:CustomerBooking[] };
+type View = "agenda" | "customers";
+type StatusFilter = "all" | BookingStatus;
 
-const today = () => new Date().toISOString().slice(0, 10);
-const statusLabel = { confirmed: "Confirmado", completed: "Concluído", cancelled: "Cancelado" };
+const today = () => { const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+const statusLabel:Record<BookingStatus,string> = { confirmed:"Confirmado", completed:"Concluído", cancelled:"Cancelado", no_show:"Não compareceu" };
 
-export default function BarberDashboard() {
-  const [auth, setAuth] = useState<"loading" | "guest" | "barber">("loading");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [date, setDate] = useState(today);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+export default function BarberDashboard(){
+  const [auth,setAuth]=useState<"loading"|"guest"|"barber">("loading");
+  const [view,setView]=useState<View>("agenda");
+  const [email,setEmail]=useState(""); const [password,setPassword]=useState("");
+  const [date,setDate]=useState(today); const [bookings,setBookings]=useState<Booking[]>([]); const [customers,setCustomers]=useState<Customer[]>([]);
+  const [statusFilter,setStatusFilter]=useState<StatusFilter>("all"); const [agendaSearch,setAgendaSearch]=useState(""); const [customerSearch,setCustomerSearch]=useState("");
+  const [selectedCustomer,setSelectedCustomer]=useState<Customer|null>(null); const [noteDraft,setNoteDraft]=useState("");
+  const [loading,setLoading]=useState(false); const [customersLoading,setCustomersLoading]=useState(false); const [savingNotes,setSavingNotes]=useState(false); const [message,setMessage]=useState("");
 
-  const loadBookings = useCallback(async (selectedDate: string, quiet = false) => {
-    if (!quiet) setLoading(true);
-    const response = await fetch(`/api/barbeiro/agendamentos?date=${selectedDate}`, { cache: "no-store" });
-    if (response.status === 401) {
-      setAuth("guest");
-      setBookings([]);
-      setLoading(false);
-      return;
-    }
-    const data = await response.json();
-    if (response.ok) setBookings(data.bookings);
-    else setMessage(data.error ?? "Não foi possível carregar a agenda.");
-    if (!quiet) setLoading(false);
-  }, []);
+  const loadBookings=useCallback(async(selectedDate:string,quiet=false)=>{ if(!quiet)setLoading(true); const response=await fetch(`/api/barbeiro/agendamentos?date=${selectedDate}`,{cache:"no-store"}); if(response.status===401){setAuth("guest");setBookings([]);setLoading(false);return;} const data=await response.json(); if(response.ok)setBookings(data.bookings);else setMessage(data.error??"Não foi possível carregar a agenda."); if(!quiet)setLoading(false);},[]);
+  const loadCustomers=useCallback(async(quiet=false)=>{ if(!quiet)setCustomersLoading(true); const response=await fetch("/api/barbeiro/clientes",{cache:"no-store"}); if(response.status===401){setAuth("guest");setCustomers([]);setCustomersLoading(false);return;} const data=await response.json(); if(response.ok)setCustomers(data.customers);else setMessage(data.error??"Não foi possível carregar os clientes."); if(!quiet)setCustomersLoading(false);},[]);
 
-  useEffect(() => {
-    fetch("/api/barbeiro/session", { cache: "no-store" }).then(async response => {
-      if (response.ok) {
-        setAuth("barber");
-        await loadBookings(date);
-      } else setAuth("guest");
-    });
-  }, [date, loadBookings]);
+  useEffect(()=>{fetch("/api/barbeiro/session",{cache:"no-store"}).then(async response=>{if(response.ok){setAuth("barber");await loadBookings(date);}else setAuth("guest");});},[date,loadBookings]);
+  useEffect(()=>{if(auth!=="barber")return;const timer=window.setInterval(()=>loadBookings(date,true),30000);return()=>window.clearInterval(timer);},[auth,date,loadBookings]);
+  useEffect(()=>{if(auth==="barber"&&view==="customers"&&customers.length===0)loadCustomers();},[auth,customers.length,loadCustomers,view]);
 
-  useEffect(() => {
-    if (auth !== "barber") return;
-    const timer = window.setInterval(() => loadBookings(date, true), 30000);
-    return () => window.clearInterval(timer);
-  }, [auth, date, loadBookings]);
+  const filteredBookings=useMemo(()=>{const q=agendaSearch.trim().toLocaleLowerCase("pt-BR");return bookings.filter(item=>(statusFilter==="all"||item.status===statusFilter)&&(!q||item.customer_name.toLocaleLowerCase("pt-BR").includes(q)||item.customer_phone.includes(q)||item.services?.name.toLocaleLowerCase("pt-BR").includes(q)));},[agendaSearch,bookings,statusFilter]);
+  const filteredCustomers=useMemo(()=>{const q=customerSearch.trim().toLocaleLowerCase("pt-BR");return customers.filter(item=>!q||item.name.toLocaleLowerCase("pt-BR").includes(q)||item.phone.includes(q));},[customerSearch,customers]);
+  const summary=useMemo(()=>({total:bookings.length,confirmed:bookings.filter(i=>i.status==="confirmed").length,completed:bookings.filter(i=>i.status==="completed").length,noShow:bookings.filter(i=>i.status==="no_show").length}),[bookings]);
+  const customerSummary=useMemo(()=>({total:customers.length,attended:customers.filter(i=>i.bookings.some(b=>b.status==="completed")).length,noShow:customers.filter(i=>i.bookings.some(b=>b.status==="no_show")).length}),[customers]);
 
-  const summary = useMemo(() => ({
-    total: bookings.length,
-    confirmed: bookings.filter(item => item.status === "confirmed").length,
-    completed: bookings.filter(item => item.status === "completed").length,
-  }), [bookings]);
+  async function login(event:FormEvent){event.preventDefault();setLoading(true);setMessage("");const response=await fetch("/api/barbeiro/session",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password})});const data=await response.json();if(!response.ok){setMessage(data.error??"Acesso não autorizado.");setLoading(false);return;}setPassword("");setAuth("barber");await loadBookings(date);}
+  async function logout(){await fetch("/api/barbeiro/session",{method:"DELETE"});setAuth("guest");setBookings([]);setCustomers([]);}
+  async function updateStatus(id:string,status:BookingStatus){setMessage("");const response=await fetch("/api/barbeiro/agendamentos",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,status})});const data=await response.json();if(!response.ok)setMessage(data.error??"Não foi possível atualizar.");else{await loadBookings(date,true);if(customers.length)await loadCustomers(true);}}
+  function openCustomer(customer:Customer){setSelectedCustomer(customer);setNoteDraft(customer.notes);}
+  async function saveNotes(){if(!selectedCustomer)return;setSavingNotes(true);setMessage("");const response=await fetch("/api/barbeiro/clientes",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:selectedCustomer.id,notes:noteDraft})});const data=await response.json();if(!response.ok)setMessage(data.error??"Não foi possível salvar.");else{const updated={...selectedCustomer,notes:noteDraft.trim()};setSelectedCustomer(updated);setCustomers(current=>current.map(item=>item.id===updated.id?updated:item));}setSavingNotes(false);}
 
-  async function login(event: FormEvent) {
-    event.preventDefault();
-    setLoading(true);
-    setMessage("");
-    const response = await fetch("/api/barbeiro/session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      setMessage(data.error ?? "Acesso não autorizado.");
-      setLoading(false);
-      return;
-    }
-    setPassword("");
-    setAuth("barber");
-    await loadBookings(date);
-  }
+  if(auth==="loading")return <main className="barber-loading"><LoaderCircle className="spin"/><span>Preparando área segura</span></main>;
+  if(auth==="guest")return <main className="barber-login-page"><a className="barber-back" href="/"><ArrowLeft size={17}/> Voltar ao site</a><section className="barber-login-card"><div className="barber-monogram">D</div><p className="barber-kicker">D.BARBERSHOP CENTRAL · ACESSO RESTRITO</p><h1>Administração.</h1><p className="barber-subtitle">Acesso exclusivo do barbeiro para gerenciar agenda e relacionamento com clientes.</p><form onSubmit={login}><label>E-mail<input type="email" autoComplete="username" value={email} onChange={e=>setEmail(e.target.value)} required/></label><label>Senha<input type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} minLength={8} required/></label>{message&&<p className="barber-error" role="alert">{message}</p>}<button className="barber-primary" disabled={loading}>{loading?<LoaderCircle className="spin" size={19}/>:<LockKeyhole size={19}/>} Entrar na Central</button></form></section></main>;
 
-  async function logout() {
-    await fetch("/api/barbeiro/session", { method: "DELETE" });
-    setAuth("guest");
-    setBookings([]);
-  }
+  return <main className="barber-dashboard">
+    <aside className="barber-sidebar"><div className="barber-signature"><span className="barber-signature-mark">D</span><span><strong>D.BARBERSHOP</strong><small>CENTRAL</small></span></div><nav aria-label="Navegação do painel"><span className="barber-nav-label">ADMINISTRAÇÃO</span><button className={view==="agenda"?"active":""} type="button" onClick={()=>setView("agenda")}><LayoutDashboard size={18}/><span>Agenda</span></button><button className={view==="customers"?"active":""} type="button" onClick={()=>setView("customers")}><Users size={18}/><span>Clientes</span><b>{customers.length||""}</b></button></nav><div className="barber-sidebar-foot"><a href="/" target="_blank" rel="noreferrer"><ExternalLink size={17}/><span>Ver site</span></a><button onClick={logout} aria-label="Sair"><LogOut size={17}/><span>Sair</span></button></div></aside>
+    <div className="barber-workspace"><header className="barber-header"><div><span className="barber-live"><i/> CENTRAL ONLINE</span><small>Dados sincronizados com o site</small></div>{view==="agenda"?<label className="barber-date"><CalendarDays size={17}/><span>Selecionar data</span><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></label>:<div className="barber-global-search"><Search size={17}/><input aria-label="Buscar cliente" placeholder="Buscar cliente ou telefone" value={customerSearch} onChange={e=>setCustomerSearch(e.target.value)}/></div>}</header>
+      <div className="barber-content">{view==="agenda"?<AgendaView/>:<CustomersView/>}</div>
+    </div>
+  </main>;
 
-  async function updateStatus(id: string, status: Booking["status"]) {
-    setMessage("");
-    const response = await fetch("/api/barbeiro/agendamentos", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status }),
-    });
-    const data = await response.json();
-    if (!response.ok) setMessage(data.error ?? "Não foi possível atualizar.");
-    else await loadBookings(date, true);
-  }
+  function AgendaView(){return <><section className="barber-heading"><div><p className="barber-kicker">VISÃO DO DIA</p><h1>Agenda de trabalho.</h1><p>Acompanhe, filtre e atualize cada atendimento.</p></div><span className="barber-day-number">{new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR",{day:"2-digit"})}<small>{new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR",{month:"short"}).replace(".","")}</small></span></section><section className="barber-stats" aria-label="Resumo do dia"><article><span><small>01</small>Horários</span><strong>{summary.total.toString().padStart(2,"0")}</strong></article><article><span><small>02</small>Confirmados</span><strong>{summary.confirmed.toString().padStart(2,"0")}</strong></article><article><span><small>03</small>Concluídos</span><strong>{summary.completed.toString().padStart(2,"0")}</strong></article><article className="missed"><span><small>04</small>Faltaram</span><strong>{summary.noShow.toString().padStart(2,"0")}</strong></article></section><section className="barber-agenda"><div className="barber-agenda-title"><div><p className="barber-kicker">ROTEIRO DE ATENDIMENTOS</p><h2>{new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long"})}</h2></div><button onClick={()=>loadBookings(date)} aria-label="Atualizar agenda"><RefreshCw className={loading?"spin":""} size={18}/> Atualizar</button></div><div className="barber-filters"><label><Search size={16}/><input aria-label="Buscar na agenda" placeholder="Buscar nome, telefone ou serviço" value={agendaSearch} onChange={e=>setAgendaSearch(e.target.value)}/></label><div>{(["all","confirmed","completed","no_show","cancelled"] as StatusFilter[]).map(filter=><button type="button" key={filter} className={statusFilter===filter?"active":""} onClick={()=>setStatusFilter(filter)}>{filter==="all"?"Todos":statusLabel[filter]}</button>)}</div></div>{message&&<p className="barber-error" role="alert">{message}</p>}{loading?<div className="barber-empty"><LoaderCircle className="spin"/><p>Carregando horários...</p></div>:filteredBookings.length===0?<div className="barber-empty"><CalendarDays/><h3>Nenhum atendimento encontrado.</h3><p>Altere os filtros ou escolha outra data.</p></div>:<div className="barber-booking-list">{filteredBookings.map(booking=><article className={`barber-booking ${booking.status}`} key={booking.id}><div className="barber-time"><span>HORÁRIO</span><strong>{booking.booking_time.slice(0,5)}</strong></div><div className="barber-booking-info"><div><span className={`barber-status ${booking.status}`}>{statusLabel[booking.status]}</span><h3>{booking.customer_name}</h3></div><ul><li><Scissors size={16}/>{booking.services?.name??"Serviço"}</li><li><Clock3 size={16}/>{booking.services?.duration_minutes??0} minutos</li><li><Phone size={16}/><a href={`tel:${booking.customer_phone.replace(/\D/g,"")}`}>{booking.customer_phone}</a></li></ul></div><div className="barber-actions">{booking.status!=="completed"&&<button className="complete" onClick={()=>updateStatus(booking.id,"completed")}><CheckCircle2 size={16}/> Concluir</button>}{booking.status!=="no_show"&&<button className="no-show" onClick={()=>updateStatus(booking.id,"no_show")}><UserX size={16}/> Não veio</button>}{booking.status!=="cancelled"&&<button onClick={()=>updateStatus(booking.id,"cancelled")}><XCircle size={16}/> Cancelar</button>}{booking.status!=="confirmed"&&<button onClick={()=>updateStatus(booking.id,"confirmed")}><UserRound size={16}/> Reabrir</button>}</div></article>)}</div>}</section></>}
 
-  if (auth === "loading") {
-    return <main className="barber-loading"><LoaderCircle className="spin" /><span>Preparando área segura</span></main>;
-  }
+  function CustomersView(){return <><section className="barber-heading clients-heading"><div><p className="barber-kicker">RELACIONAMENTO</p><h1>Clientes.</h1><p>Histórico e preferências salvos automaticamente a cada agendamento.</p></div><button className="barber-refresh-clients" onClick={()=>loadCustomers()}><RefreshCw className={customersLoading?"spin":""} size={17}/> Atualizar</button></section><section className="barber-stats clients-stats"><article><span><small>01</small>Cadastrados</span><strong>{customerSummary.total.toString().padStart(2,"0")}</strong></article><article><span><small>02</small>Já atendidos</span><strong>{customerSummary.attended.toString().padStart(2,"0")}</strong></article><article className="missed"><span><small>03</small>Com faltas</span><strong>{customerSummary.noShow.toString().padStart(2,"0")}</strong></article></section>{message&&<p className="barber-error" role="alert">{message}</p>}<section className="customer-layout"><div className="customer-directory"><div className="customer-directory-head"><div><p className="barber-kicker">BASE DE CLIENTES</p><h2>{filteredCustomers.length} {filteredCustomers.length===1?"cliente":"clientes"}</h2></div><div className="customer-search-mobile"><Search size={16}/><input placeholder="Buscar cliente" value={customerSearch} onChange={e=>setCustomerSearch(e.target.value)}/></div></div>{customersLoading?<div className="barber-empty"><LoaderCircle className="spin"/><p>Carregando clientes...</p></div>:filteredCustomers.length===0?<div className="barber-empty"><Users/><h3>Nenhum cliente encontrado.</h3></div>:<div className="customer-list">{filteredCustomers.map(customer=><CustomerRow key={customer.id} customer={customer}/>)}</div>}</div><CustomerProfile/></section></>}
 
-  if (auth === "guest") {
-    return (
-      <main className="barber-login-page">
-        <a className="barber-back" href="/"><ArrowLeft size={17} /> Voltar ao site</a>
-        <section className="barber-login-card">
-          <div className="barber-monogram">D</div>
-          <p className="barber-kicker">D.BARBERSHOP · ÁREA RESTRITA</p>
-          <h1>Agenda do barbeiro.</h1>
-          <p className="barber-subtitle">Acesso exclusivo para acompanhar e organizar os atendimentos.</p>
-          <form onSubmit={login}>
-            <label>E-mail<input type="email" autoComplete="username" value={email} onChange={event => setEmail(event.target.value)} required /></label>
-            <label>Senha<input type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} minLength={8} required /></label>
-            {message && <p className="barber-error" role="alert">{message}</p>}
-            <button className="barber-primary" disabled={loading}>{loading ? <LoaderCircle className="spin" size={19} /> : <LockKeyhole size={19} />} Entrar com segurança</button>
-          </form>
-        </section>
-      </main>
-    );
-  }
-
-  return (
-    <main className="barber-dashboard">
-      <aside className="barber-sidebar">
-        <div className="barber-signature">
-          <span className="barber-signature-mark">D</span>
-          <span><strong>D.BARBER</strong><small>STUDIO CONTROL</small></span>
-        </div>
-        <nav aria-label="Navegação do painel">
-          <span className="barber-nav-label">GESTÃO</span>
-          <button className="active" type="button"><LayoutDashboard size={18} /><span>Agenda</span></button>
-        </nav>
-        <div className="barber-sidebar-foot">
-          <a href="/" target="_blank"><ExternalLink size={17} /><span>Ver site</span></a>
-          <button onClick={logout} aria-label="Sair"><LogOut size={17} /><span>Sair</span></button>
-        </div>
-      </aside>
-
-      <div className="barber-workspace">
-        <header className="barber-header">
-          <div>
-            <span className="barber-live"><i /> PAINEL ONLINE</span>
-            <small>Área exclusiva do profissional</small>
-          </div>
-          <label className="barber-date"><CalendarDays size={17} /><span>Selecionar data</span><input type="date" value={date} onChange={event => setDate(event.target.value)} /></label>
-        </header>
-
-        <div className="barber-content">
-          <section className="barber-heading">
-            <div><p className="barber-kicker">VISÃO DO DIA</p><h1>Agenda de trabalho.</h1><p>Acompanhe cada atendimento do dia em um só lugar.</p></div>
-            <span className="barber-day-number">{new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", { day: "2-digit" })}<small>{new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}</small></span>
-          </section>
-
-          <section className="barber-stats" aria-label="Resumo do dia">
-            <article><span><small>01</small>Horários</span><strong>{summary.total.toString().padStart(2, "0")}</strong></article>
-            <article><span><small>02</small>Confirmados</span><strong>{summary.confirmed.toString().padStart(2, "0")}</strong></article>
-            <article><span><small>03</small>Concluídos</span><strong>{summary.completed.toString().padStart(2, "0")}</strong></article>
-          </section>
-
-          <section className="barber-agenda">
-            <div className="barber-agenda-title"><div><p className="barber-kicker">ROTEIRO DE ATENDIMENTOS</p><h2>{new Date(`${date}T12:00:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}</h2></div><button onClick={() => loadBookings(date)} aria-label="Atualizar agenda"><RefreshCw className={loading ? "spin" : ""} size={18} /> Atualizar</button></div>
-            {message && <p className="barber-error" role="alert">{message}</p>}
-            {loading ? <div className="barber-empty"><LoaderCircle className="spin" /><p>Carregando horários...</p></div> :
-            bookings.length === 0 ? <div className="barber-empty"><CalendarDays /><h3>Agenda livre nesta data.</h3><p>Os próximos agendamentos realizados no site aparecerão aqui automaticamente.</p></div> :
-            <div className="barber-booking-list">{bookings.map(booking => (
-              <article className={`barber-booking ${booking.status}`} key={booking.id}>
-                <div className="barber-time"><span>HORÁRIO</span><strong>{booking.booking_time.slice(0, 5)}</strong></div>
-                <div className="barber-booking-info">
-                  <div><span className={`barber-status ${booking.status}`}>{statusLabel[booking.status]}</span><h3>{booking.customer_name}</h3></div>
-                  <ul>
-                    <li><Scissors size={16} />{booking.services?.name ?? "Serviço"}</li>
-                    <li><Clock3 size={16} />{booking.services?.duration_minutes ?? 0} minutos</li>
-                    <li><Phone size={16} /><a href={`tel:${booking.customer_phone.replace(/\D/g, "")}`}>{booking.customer_phone}</a></li>
-                  </ul>
-                </div>
-                <div className="barber-actions">
-                  {booking.status !== "completed" && <button className="complete" onClick={() => updateStatus(booking.id, "completed")}><CheckCircle2 size={17} /> Concluir</button>}
-                  {booking.status !== "cancelled" && <button onClick={() => updateStatus(booking.id, "cancelled")}><XCircle size={17} /> Cancelar</button>}
-                  {booking.status !== "confirmed" && <button onClick={() => updateStatus(booking.id, "confirmed")}><UserRound size={17} /> Reabrir</button>}
-                </div>
-              </article>
-            ))}</div>}
-          </section>
-        </div>
-      </div>
-    </main>
-  );
+  function CustomerRow({customer}:{customer:Customer}){const completed=customer.bookings.filter(i=>i.status==="completed").length;const missed=customer.bookings.filter(i=>i.status==="no_show").length;const latest=[...customer.bookings].sort((a,b)=>`${b.booking_date}${b.booking_time}`.localeCompare(`${a.booking_date}${a.booking_time}`))[0];return <button type="button" className={selectedCustomer?.id===customer.id?"active":""} onClick={()=>openCustomer(customer)}><span className="customer-avatar">{customer.name.charAt(0).toUpperCase()}</span><span className="customer-main"><strong>{customer.name}</strong><small>{customer.phone}</small></span><span className="customer-metrics"><b>{completed}</b><small>visitas</small></span>{missed>0&&<span className="customer-missed"><UserX size={13}/>{missed}</span>}<span className="customer-last"><small>Último registro</small><b>{latest?new Date(`${latest.booking_date}T12:00:00`).toLocaleDateString("pt-BR"):"—"}</b></span></button>}
+  function CustomerProfile(){if(!selectedCustomer)return <aside className="customer-profile"><div className="customer-profile-empty"><UserRound/><h3>Selecione um cliente</h3><p>Veja o histórico e registre preferências importantes.</p></div></aside>;return <aside className="customer-profile open"><button className="customer-close" onClick={()=>setSelectedCustomer(null)} aria-label="Fechar perfil">×</button><span className="customer-profile-avatar">{selectedCustomer.name.charAt(0).toUpperCase()}</span><p className="barber-kicker">PERFIL DO CLIENTE</p><h2>{selectedCustomer.name}</h2><a href={`tel:${selectedCustomer.phone.replace(/\D/g,"")}`}><Phone size={15}/>{selectedCustomer.phone}</a><div className="customer-profile-numbers"><span><strong>{selectedCustomer.bookings.filter(i=>i.status==="completed").length}</strong><small>Atendimentos</small></span><span><strong>{selectedCustomer.bookings.filter(i=>i.status==="no_show").length}</strong><small>Faltas</small></span></div><label>Observações<textarea maxLength={1000} placeholder="Preferências, corte habitual ou informações importantes..." value={noteDraft} onChange={e=>setNoteDraft(e.target.value)}/></label><button className="customer-save" disabled={savingNotes} onClick={saveNotes}>{savingNotes?<LoaderCircle className="spin" size={16}/>:<Save size={16}/>} Salvar observações</button><div className="customer-history"><p>HISTÓRICO RECENTE</p>{[...selectedCustomer.bookings].sort((a,b)=>`${b.booking_date}${b.booking_time}`.localeCompare(`${a.booking_date}${a.booking_time}`)).slice(0,4).map(item=><div key={item.id}><span><strong>{new Date(`${item.booking_date}T12:00:00`).toLocaleDateString("pt-BR")}</strong><small>{item.services?.name??"Serviço"}</small></span><b className={item.status}>{statusLabel[item.status]}</b></div>)}</div></aside>}
 }
