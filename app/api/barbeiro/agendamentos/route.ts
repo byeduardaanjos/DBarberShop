@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireBarber } from "@/lib/barber-auth";
 
-const statuses = new Set(["confirmed", "completed", "cancelled"]);
+const statuses = new Set(["confirmed", "completed", "cancelled", "no_show"]);
 
 function supabaseConfig() {
   const url = process.env.SUPABASE_URL;
@@ -54,4 +54,3 @@ export async function PATCH(request: NextRequest) {
   if (!response.ok) return NextResponse.json({ error: "Não foi possível atualizar o horário." }, { status: 502 });
   return NextResponse.json({ booking: (await response.json())[0] });
 }
-
