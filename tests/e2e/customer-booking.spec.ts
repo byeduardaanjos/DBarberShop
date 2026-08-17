@@ -61,7 +61,7 @@ test.describe("Cliente — agendamento", () => {
     await expect(dialog.getByText("DB-123E45")).toBeVisible();
     await expect(dialog.getByRole("link", { name: /Cancelar ou reagendar/ })).toHaveAttribute(
       "href",
-      `/agendamento/${bookingId}?token=${manageToken}`,
+      `/agendamento/${bookingId}#token=${manageToken}`,
     );
     expect(submittedBody).toMatchObject({
       service: "Corte masculino",
