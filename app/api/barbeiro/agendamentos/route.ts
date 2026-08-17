@@ -17,18 +17,26 @@ export async function GET(request: NextRequest) {
   if (!config) return NextResponse.json({ error: "Banco não configurado." }, { status: 503 });
 
   const date = request.nextUrl.searchParams.get("date");
-  const validDate = date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : new Date().toISOString().slice(0, 10);
+  const from = request.nextUrl.searchParams.get("from");
+  const upcoming = request.nextUrl.searchParams.get("scope") === "upcoming";
+  const fallbackDate = new Date().toISOString().slice(0, 10);
+  const validDate = date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : fallbackDate;
+  const validFrom = from && /^\d{4}-\d{2}-\d{2}$/.test(from) ? from : fallbackDate;
   const query = new URLSearchParams({
     select: "id,customer_name,customer_phone,booking_date,booking_time,status,created_at,services(name,duration_minutes)",
-    booking_date: `eq.${validDate}`,
-    order: "booking_time.asc",
+    booking_date: upcoming ? `gte.${validFrom}` : `eq.${validDate}`,
+    order: upcoming ? "booking_date.asc,booking_time.asc" : "booking_time.asc",
   });
+  if (upcoming) {
+    query.set("status", "eq.confirmed");
+    query.set("limit", "6");
+  }
   const response = await fetch(`${config.url}/rest/v1/bookings?${query}`, {
     headers: { apikey: config.key, Authorization: `Bearer ${session.accessToken}` },
     cache: "no-store",
   });
   if (!response.ok) return NextResponse.json({ error: "Não foi possível carregar a agenda." }, { status: 502 });
-  return NextResponse.json({ bookings: await response.json(), date: validDate });
+  return NextResponse.json({ bookings: await response.json(), date: upcoming ? validFrom : validDate });
 }
 
 export async function PATCH(request: NextRequest) {
