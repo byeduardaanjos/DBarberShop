@@ -2,16 +2,17 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft, CalendarDays, CheckCircle2, ChevronRight, Clock3, ExternalLink, LayoutDashboard,
+  ArrowLeft, CalendarDays, CalendarOff, CheckCircle2, ChevronRight, Clock3, ExternalLink, LayoutDashboard,
   LoaderCircle, LockKeyhole, LogOut, Phone, RefreshCw, Save, Scissors, Search,
   UserRound, Users, UserX, XCircle,
 } from "lucide-react";
+import AvailabilityManager from "./AvailabilityManager";
 
 type BookingStatus = "confirmed" | "completed" | "cancelled" | "no_show";
 type Booking = { id:string; customer_name:string; customer_phone:string; booking_date:string; booking_time:string; status:BookingStatus; services:{name:string;duration_minutes:number}|null };
 type CustomerBooking = { id:string; booking_date:string; booking_time:string; status:BookingStatus; services:{name:string}|null };
 type Customer = { id:string; name:string; phone:string; notes:string; created_at:string; updated_at:string; bookings:CustomerBooking[] };
-type View = "agenda" | "customers";
+type View = "agenda" | "customers" | "availability";
 type StatusFilter = "all" | BookingStatus;
 
 const today = () => { const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
@@ -49,9 +50,9 @@ export default function BarberDashboard(){
   if(auth==="guest")return <main className="barber-login-page"><a className="barber-back" href="/"><ArrowLeft size={17}/> Voltar ao site</a><section className="barber-login-card"><div className="barber-monogram">D</div><p className="barber-kicker">D.BARBERSHOP CENTRAL · ACESSO RESTRITO</p><h1>Administração.</h1><p className="barber-subtitle">Acesso exclusivo do barbeiro para gerenciar agenda e relacionamento com clientes.</p><form onSubmit={login}><label>E-mail<input type="email" autoComplete="username" value={email} onChange={e=>setEmail(e.target.value)} required/></label><label>Senha<input type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} minLength={8} required/></label>{message&&<p className="barber-error" role="alert">{message}</p>}<button className="barber-primary" disabled={loading}>{loading?<LoaderCircle className="spin" size={19}/>:<LockKeyhole size={19}/>} Entrar na Central</button></form></section></main>;
 
   return <main className="barber-dashboard">
-    <aside className="barber-sidebar"><div className="barber-signature"><span className="barber-signature-mark">D</span><span><strong>D.BARBERSHOP</strong><small>CENTRAL</small></span></div><nav aria-label="Navegação do painel"><span className="barber-nav-label">ADMINISTRAÇÃO</span><button className={view==="agenda"?"active":""} type="button" onClick={()=>setView("agenda")}><LayoutDashboard size={18}/><span>Agenda</span></button><button className={view==="customers"?"active":""} type="button" onClick={()=>setView("customers")}><Users size={18}/><span>Clientes</span><b>{customers.length||""}</b></button></nav><div className="barber-sidebar-foot"><a href="/" target="_blank" rel="noreferrer"><ExternalLink size={17}/><span>Ver site</span></a><button onClick={logout} aria-label="Sair"><LogOut size={17}/><span>Sair</span></button></div></aside>
-    <div className="barber-workspace"><header className="barber-header"><div><span className="barber-live"><i/> CENTRAL ONLINE</span><small>Dados sincronizados com o site</small></div>{view==="agenda"?<label className="barber-date"><CalendarDays size={17}/><span>Selecionar data</span><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></label>:<div className="barber-global-search"><Search size={17}/><input aria-label="Buscar cliente" placeholder="Buscar cliente ou telefone" value={customerSearch} onChange={e=>setCustomerSearch(e.target.value)}/></div>}</header>
-      <div className="barber-content">{view==="agenda"?<><UpcomingPanel/><AgendaView/></>:<CustomersView/>}</div>
+    <aside className="barber-sidebar"><div className="barber-signature"><span className="barber-signature-mark">D</span><span><strong>D.BARBERSHOP</strong><small>CENTRAL</small></span></div><nav aria-label="Navegação do painel"><span className="barber-nav-label">ADMINISTRAÇÃO</span><button aria-label="Agenda" className={view==="agenda"?"active":""} type="button" onClick={()=>setView("agenda")}><LayoutDashboard size={18}/><span>Agenda</span></button><button aria-label="Clientes" className={view==="customers"?"active":""} type="button" onClick={()=>setView("customers")}><Users size={18}/><span>Clientes</span><b>{customers.length||""}</b></button><button aria-label="Disponibilidade" className={view==="availability"?"active":""} type="button" onClick={()=>setView("availability")}><CalendarOff size={18}/><span>Disponibilidade</span></button></nav><div className="barber-sidebar-foot"><a href="/" target="_blank" rel="noreferrer"><ExternalLink size={17}/><span>Ver site</span></a><button onClick={logout} aria-label="Sair"><LogOut size={17}/><span>Sair</span></button></div></aside>
+    <div className="barber-workspace"><header className="barber-header"><div><span className="barber-live"><i/> CENTRAL ONLINE</span><small>Dados sincronizados com o site</small></div>{view==="agenda"?<label className="barber-date"><CalendarDays size={17}/><span>Selecionar data</span><input type="date" value={date} onChange={e=>setDate(e.target.value)}/></label>:view==="customers"?<div className="barber-global-search"><Search size={17}/><input aria-label="Buscar cliente" placeholder="Buscar cliente ou telefone" value={customerSearch} onChange={e=>setCustomerSearch(e.target.value)}/></div>:<span className="barber-header-section"><CalendarOff/> CONTROLE DE HORÁRIOS</span>}</header>
+      <div className="barber-content">{view==="agenda"?<><UpcomingPanel/><AgendaView/></>:view==="customers"?<CustomersView/>:<AvailabilityManager/>}</div>
     </div>
   </main>;
 

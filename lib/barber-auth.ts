@@ -103,7 +103,15 @@ export async function requireBarber() {
 
 export async function clearBarberSession() {
   const store = await cookies();
+  const accessToken = store.get(ACCESS_COOKIE)?.value;
+  if (accessToken) {
+    const { url, key } = config();
+    await fetch(`${url}/auth/v1/logout`, {
+      method: "POST",
+      headers: { apikey: key, Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    }).catch(() => null);
+  }
   store.delete(ACCESS_COOKIE);
   store.delete(REFRESH_COOKIE);
 }
-
