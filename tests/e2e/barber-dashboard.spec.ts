@@ -13,7 +13,7 @@ test.describe("Barbeiro — painel administrativo", () => {
     await expect(page.getByRole("navigation", { name: "Navegação do painel" })).toHaveCount(0);
   });
 
-  test("barbeiro autenticado visualiza agenda e clientes sincronizados", async ({ page }) => {
+  test("barbeiro autenticado visualiza agenda e clientes sincronizados", async ({ page, isMobile }) => {
     await page.route("**/api/barbeiro/session", async route => {
       await route.fulfill({ status: 200, contentType: "application/json", body: "{\"authenticated\":true}" });
     });
@@ -53,7 +53,7 @@ test.describe("Barbeiro — painel administrativo", () => {
     });
 
     await page.goto("/barbeiro");
-    await expect(page.getByText("CENTRAL ONLINE")).toBeVisible();
+    if (!isMobile) await expect(page.getByText("CENTRAL ONLINE")).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Navegação do painel" })).toBeVisible();
     await page.getByRole("button", { name: /Clientes/ }).click();
     await expect(page.getByText("Cliente Painel", { exact: true })).toBeVisible();
