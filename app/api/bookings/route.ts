@@ -28,5 +28,6 @@ export async function POST(request: NextRequest) {
     if (message.includes("slot_unavailable")) return NextResponse.json({ error: "Esse horário acabou de ser reservado. Escolha outro." }, { status: 409 });
     return NextResponse.json({ error: "Não foi possível concluir o agendamento." }, { status: 502 });
   }
-  return NextResponse.json({ bookingId: await response.json() }, { status: 201 });
+  const bookingId = (await response.json()) as string;
+  return NextResponse.json({ bookingId }, { status: 201 });
 }
