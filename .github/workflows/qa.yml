@@ -1,0 +1,53 @@
+name: Qualidade
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, build e testes
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Instalar navegadores de teste
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Verificar código
+        run: npm run lint
+
+      - name: Validar build de produção
+        run: npm run build
+
+      - name: Testar contratos das APIs
+        run: npm run test:api
+
+      - name: Testar experiências desktop e celular
+        run: npm run test:e2e
+
+      - name: Publicar evidências quando houver falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencias-playwright
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
