@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ArrowDown, ArrowLeft, ArrowRight, CalendarDays, Check, Clock3, Instagram, MapPin, Menu, MessageCircle, X } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, CalendarDays, Check, Clock3, Download, Hash, Instagram, MapPin, Menu, MessageCircle, Scissors, X } from "lucide-react";
 import PremiumCalendar from "./components/PremiumCalendar";
 
 const services = [
@@ -9,6 +9,22 @@ const services = [
   { name: "Corte + barba", detail: "A experiência completa para renovar o visual.", time: "80 min", price: "R$ 100", image: "/images/imperium-ambiente-v3.webp" },
 ];
 const times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"];
+
+type ConfirmedBooking = { id: string; service: string; date: string; time: string; name: string };
+
+function formatBookingDate(value: string) {
+  return new Date(`${value}T12:00:00`).toLocaleDateString("pt-BR", {
+    weekday: "long", day: "2-digit", month: "long", year: "numeric",
+  });
+}
+
+function bookingCode(id: string) {
+  return `DB-${id.replace(/-/g, "").slice(0, 6).toUpperCase()}`;
+}
+
+function toIcsDate(date: Date) {
+  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
 
 export default function Home() {
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -23,7 +39,8 @@ export default function Home() {
   const [loadingTimes, setLoadingTimes] = useState(false);
   const [bookingError, setBookingError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  function openBooking(selected?: string) { if (selected) setService(selected); setBookingOpen(true); setMenuOpen(false); setStep(1); }
+  const [confirmedBooking, setConfirmedBooking] = useState<ConfirmedBooking | null>(null);
+  function openBooking(selected?: string) { if (selected) setService(selected); setBookingOpen(true); setMenuOpen(false); setConfirmedBooking(null); setBookingError(""); setStep(1); }
   async function loadAvailability(selectedDate: string) {
     setDate(selectedDate); setTime(""); setBookingError(""); setLoadingTimes(true);
     try {
@@ -40,10 +57,35 @@ export default function Home() {
       const response = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ service, date, time, name, phone }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
+      setConfirmedBooking({ id: result.bookingId, service, date, time, name: name.trim() });
       setStep(3);
     } catch (error) { setBookingError(error instanceof Error ? error.message : "Não foi possível concluir o agendamento."); }
     finally { setSubmitting(false); }
   }
+  function saveToCalendar() {
+    if (!confirmedBooking) return;
+    const start = new Date(`${confirmedBooking.date}T${confirmedBooking.time}:00`);
+    const duration = Number.parseInt(services.find(item => item.name === confirmedBooking.service)?.time ?? "60", 10);
+    const end = new Date(start.getTime() + duration * 60_000);
+    const calendar = [
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//D.BarberShop//Agendamento//PT-BR",
+      "BEGIN:VEVENT", `UID:${confirmedBooking.id}@dbarbershop`, `DTSTAMP:${toIcsDate(new Date())}`,
+      `DTSTART:${toIcsDate(start)}`, `DTEND:${toIcsDate(end)}`,
+      `SUMMARY:${confirmedBooking.service} - D.BarberShop`,
+      `DESCRIPTION:Agendamento confirmado. Código ${bookingCode(confirmedBooking.id)}.`,
+      "LOCATION:Rua Francisco Roberto da Silva, 676 - Centro, Biguaçu - SC",
+      "END:VEVENT", "END:VCALENDAR",
+    ].join("\r\n");
+    const url = URL.createObjectURL(new Blob([calendar], { type: "text/calendar;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `agendamento-${bookingCode(confirmedBooking.id).toLowerCase()}.ics`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+  const whatsappConfirmation = confirmedBooking
+    ? `https://wa.me/?text=${encodeURIComponent(`Agendamento confirmado na D.BarberShop\n\n${confirmedBooking.service}\n${formatBookingDate(confirmedBooking.date)} às ${confirmedBooking.time}\nCódigo: ${bookingCode(confirmedBooking.id)}\nCliente: ${confirmedBooking.name}`)}`
+    : "#";
   useEffect(() => { const params = new URLSearchParams(window.location.search); const selected = params.get("servico"); if (selected && services.some(item => item.name === selected)) openBooking(selected); else if (params.get("agendar") === "1") openBooking(); }, []);
 
   return <main>
@@ -71,6 +113,6 @@ export default function Home() {
     <section className="contact" id="contato"><div className="contact-heading"><p className="eyebrow">CONTATO</p><h2>Fale com a D.BarberShop.</h2></div><div className="contact-actions"><a className="contact-action" href="https://wa.me/?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20D.BarberShop%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener noreferrer"><MessageCircle className="contact-action-icon"/><span><small>ATENDIMENTO</small><strong>WhatsApp</strong><em>Dúvidas e informações</em></span><ArrowRight className="contact-action-arrow"/></a><a className="contact-action" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Abrir o Instagram da D.BarberShop"><Instagram className="contact-action-icon"/><span><small>NOVIDADES</small><strong>Instagram</strong><em>Cortes e trabalhos</em></span><ArrowRight className="contact-action-arrow"/></a></div><div className="contact-details"><a className="contact-action contact-detail" href="https://maps.app.goo.gl/md8iSMqjxu3RRUD27?g_st=ic" target="_blank" rel="noopener noreferrer"><MapPin className="contact-action-icon"/><span><small>VISITE-NOS</small><strong>Localização</strong><em>Rua Francisco Roberto da Silva, 676<br/>Centro, Biguaçu — SC</em></span><ArrowRight className="contact-action-arrow"/></a><button className="contact-action contact-detail" onClick={() => openBooking()}><Clock3 className="contact-action-icon"/><span><small>ATENDIMENTO</small><strong>Horários</strong><em>Seg–sex 09h–20h · Sáb 09h–18h<br/>Domingo fechado</em></span><CalendarDays className="contact-action-arrow"/></button></div></section>
     <footer><span className="brand brand-logo footer-brand"><img src="/images/dbarbershop-wordmark.webp" alt="D.BarberShop"/></span><span>Biguaçu — Santa Catarina</span><span>© 2026</span></footer>
 
-    {bookingOpen && <div className="modal-backdrop" onMouseDown={e=>e.target===e.currentTarget&&setBookingOpen(false)}><section className="booking-modal" role="dialog" aria-modal="true"><button className="modal-close" aria-label="Fechar agendamento" onClick={()=>setBookingOpen(false)}><X/></button>{step<3&&<p className="modal-kicker">AGENDAMENTO · ETAPA {step} DE 2</p>}{step===1&&<><h2>Escolha seu horário.</h2><label>Serviço<select value={service} onChange={e=>setService(e.target.value)}>{services.map(s=><option key={s.name}>{s.name}</option>)}</select></label><fieldset className="calendar-fieldset"><legend>Data</legend><PremiumCalendar value={date} onChange={loadAvailability}/></fieldset><fieldset><legend>Horários disponíveis</legend>{loadingTimes&&<p className="booking-feedback">Consultando horários…</p>}<div className="time-grid">{times.map(t=><button key={t} type="button" disabled={!date||loadingTimes||!availableTimes.includes(t)} className={time===t?"selected":""} onClick={()=>setTime(t)}>{t}</button>)}</div></fieldset>{bookingError&&<p className="booking-error" role="alert">{bookingError}</p>}<button className="primary-cta modal-next" disabled={!date||!time||loadingTimes} onClick={()=>setStep(2)}><span>Continuar</span><ArrowRight/></button></>}{step===2&&<form onSubmit={submitBooking}><h2>Quase tudo pronto.</h2><p className="booking-summary">{service}<br/>{date.split("-").reverse().join("/")} às {time}</p><label>Seu nome<input value={name} onChange={e=>setName(e.target.value)} placeholder="Nome completo" required/></label><label>WhatsApp<input value={phone} onChange={e=>setPhone(e.target.value)} placeholder="(48) 99999-9999" inputMode="tel" required/></label>{bookingError&&<p className="booking-error" role="alert">{bookingError}</p>}<button className="primary-cta modal-next" disabled={submitting}><span>{submitting?"Confirmando…":"Confirmar agendamento"}</span><Check/></button><button className="back-button icon-link" type="button" onClick={()=>setStep(1)}><ArrowLeft/><span>Voltar</span></button></form>}{step===3&&<div className="success"><span className="success-mark"><Check/></span><p className="modal-kicker">AGENDAMENTO CONFIRMADO</p><h2>Horário reservado.</h2><p>Seu horário foi salvo com sucesso. A D.BarberShop usará seu WhatsApp caso precise entrar em contato.</p><button className="primary-cta modal-next" onClick={()=>setBookingOpen(false)}><span>Voltar ao site</span><ArrowRight/></button></div>}</section></div>}
+    {bookingOpen && <div className="modal-backdrop" onMouseDown={e=>e.target===e.currentTarget&&setBookingOpen(false)}><section className="booking-modal" role="dialog" aria-modal="true"><button className="modal-close" aria-label="Fechar agendamento" onClick={()=>setBookingOpen(false)}><X/></button>{step<3&&<p className="modal-kicker">AGENDAMENTO · ETAPA {step} DE 2</p>}{step===1&&<><h2>Escolha seu horário.</h2><label>Serviço<select value={service} onChange={e=>setService(e.target.value)}>{services.map(s=><option key={s.name}>{s.name}</option>)}</select></label><fieldset className="calendar-fieldset"><legend>Data</legend><PremiumCalendar value={date} onChange={loadAvailability}/></fieldset><fieldset><legend>Horários disponíveis</legend>{loadingTimes&&<p className="booking-feedback">Consultando horários…</p>}<div className="time-grid">{times.map(t=><button key={t} type="button" disabled={!date||loadingTimes||!availableTimes.includes(t)} className={time===t?"selected":""} onClick={()=>setTime(t)}>{t}</button>)}</div></fieldset>{bookingError&&<p className="booking-error" role="alert">{bookingError}</p>}<button className="primary-cta modal-next" disabled={!date||!time||loadingTimes} onClick={()=>setStep(2)}><span>Continuar</span><ArrowRight/></button></>}{step===2&&<form onSubmit={submitBooking}><h2>Quase tudo pronto.</h2><p className="booking-summary">{service}<br/>{date.split("-").reverse().join("/")} às {time}</p><label>Seu nome<input value={name} onChange={e=>setName(e.target.value)} placeholder="Nome completo" required/></label><label>WhatsApp<input value={phone} onChange={e=>setPhone(e.target.value)} placeholder="(48) 99999-9999" inputMode="tel" required/></label>{bookingError&&<p className="booking-error" role="alert">{bookingError}</p>}<button className="primary-cta modal-next" disabled={submitting}><span>{submitting?"Confirmando…":"Confirmar agendamento"}</span><Check/></button><button className="back-button icon-link" type="button" onClick={()=>setStep(1)}><ArrowLeft/><span>Voltar</span></button></form>}{step===3&&confirmedBooking&&<div className="success receipt-success"><span className="success-mark"><Check/></span><p className="modal-kicker">AGENDAMENTO CONFIRMADO</p><h2>Horário reservado.</h2><p className="receipt-intro">Pronto, {confirmedBooking.name.split(" ")[0]}. Seu atendimento já está na agenda da D.BarberShop.</p><div className="booking-receipt"><div><span><Scissors/>Serviço</span><strong>{confirmedBooking.service}</strong></div><div><span><CalendarDays/>Data</span><strong>{formatBookingDate(confirmedBooking.date)}</strong></div><div><span><Clock3/>Horário</span><strong>{confirmedBooking.time}</strong></div><div><span><Hash/>Código</span><strong>{bookingCode(confirmedBooking.id)}</strong></div></div><div className="receipt-actions"><button type="button" className="primary-cta" onClick={saveToCalendar}><span>Salvar no calendário</span><Download/></button><a className="receipt-whatsapp" href={whatsappConfirmation} target="_blank" rel="noopener noreferrer"><MessageCircle/><span>Compartilhar no WhatsApp</span></a></div><button className="back-button receipt-close" onClick={()=>setBookingOpen(false)}>Voltar ao site</button></div>}</section></div>}
   </main>;
 }
