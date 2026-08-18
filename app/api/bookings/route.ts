@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHash, randomUUID } from "node:crypto";
 
-const services = new Set(["Corte Tesoura", "Degradê", "Degradê Navalhado", "Barba", "Sobrancelha", "Tesoura + Barba", "Degradê + Barba", "Navalhado + Barba", "Completo Tesoura", "VIP", "Supremo"]);
+const services = new Set(["Degradê", "Degradê Navalhado", "Sobrancelha", "Barba", "Corte na Tesoura"]);
 const times = new Set(["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"]);
 
 export async function POST(request: NextRequest) {
-  const body = (await request.json().catch(() => null)) as null | { service?: string; date?: string; time?: string; name?: string; phone?: string; privacyAccepted?: boolean };
-  if (!body || body.privacyAccepted !== true || !services.has(body.service ?? "") || !times.has(body.time ?? "") || !/^\d{4}-\d{2}-\d{2}$/.test(body.date ?? "") || (body.name?.trim().length ?? 0) < 2 || (body.name?.trim().length ?? 0) > 100 || (body.phone?.trim().length ?? 0) > 30 || (body.phone?.replace(/\D/g, "").length ?? 0) < 10 || !/^[\d\s()+-]+$/.test(body.phone ?? "")) {
+  const body = (await request.json().catch(() => null)) as null | { services?: string[]; date?: string; time?: string; name?: string; phone?: string; privacyAccepted?: boolean };
+  const selectedServices = [...new Set(body?.services ?? [])];
+  if (!body || body.privacyAccepted !== true || selectedServices.length < 1 || selectedServices.length > 5 || selectedServices.some(service => !services.has(service)) || !times.has(body.time ?? "") || !/^\d{4}-\d{2}-\d{2}$/.test(body.date ?? "") || (body.name?.trim().length ?? 0) < 2 || (body.name?.trim().length ?? 0) > 100 || (body.phone?.trim().length ?? 0) > 30 || (body.phone?.replace(/\D/g, "").length ?? 0) < 10 || !/^[\d\s()+-]+$/.test(body.phone ?? "")) {
     return NextResponse.json({ error: "Confira os dados do agendamento." }, { status: 400 });
   }
-  const service = body.service!;
   const date = body.date!;
   const time = body.time!;
   const name = body.name!.trim();
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   const response = await fetch(`${url}/rest/v1/rpc/create_public_booking`, {
     method: "POST",
     headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ p_service_name: service, p_booking_date: date, p_booking_time: time, p_customer_name: name, p_customer_phone: phone, p_manage_token_hash: manageTokenHash }),
+    body: JSON.stringify({ p_service_names: selectedServices, p_booking_date: date, p_booking_time: time, p_customer_name: name, p_customer_phone: phone, p_manage_token_hash: manageTokenHash }),
     cache: "no-store",
   });
   if (!response.ok) {
