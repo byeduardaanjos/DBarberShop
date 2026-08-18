@@ -43,7 +43,20 @@ export default function BarberDashboard(){
   const summary=useMemo(()=>({total:bookings.length,confirmed:bookings.filter(i=>i.status==="confirmed").length,completed:bookings.filter(i=>i.status==="completed").length,noShow:bookings.filter(i=>i.status==="no_show").length}),[bookings]);
   const customerSummary=useMemo(()=>({total:customers.length,attended:customers.filter(i=>i.bookings.some(b=>b.status==="completed")).length,noShow:customers.filter(i=>i.bookings.some(b=>b.status==="no_show")).length}),[customers]);
 
-  async function login(event:FormEvent){event.preventDefault();setLoading(true);setMessage("");const response=await fetch("/api/barbeiro/session",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password})});const data=await response.json();if(!response.ok){setMessage(data.error??"Acesso não autorizado.");setLoading(false);return;}setPassword("");setAuth("barber");await Promise.all([loadBookings(date),loadUpcoming()]);}
+  async function login(event:FormEvent){
+    event.preventDefault();setLoading(true);setMessage("");
+    try{
+      const response=await fetch("/api/barbeiro/session",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password}),signal:AbortSignal.timeout(10_000)});
+      const data=await response.json();
+      if(!response.ok){setMessage(data.error??"Acesso não autorizado.");return;}
+      setPassword("");setAuth("barber");
+      void Promise.allSettled([loadBookings(date),loadUpcoming()]);
+    }catch{
+      setMessage("A conexão demorou mais que o esperado. Tente novamente.");
+    }finally{
+      setLoading(false);
+    }
+  }
   async function logout(){await fetch("/api/barbeiro/session",{method:"DELETE"});setAuth("guest");setBookings([]);setUpcomingBookings([]);setCustomers([]);}
   async function updateStatus(id:string,status:BookingStatus){setMessage("");const response=await fetch("/api/barbeiro/agendamentos",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,status})});const data=await response.json();if(!response.ok)setMessage(data.error??"Não foi possível atualizar.");else{await Promise.all([loadBookings(date,true),loadUpcoming()]);if(customers.length)await loadCustomers(true);}}
   function openCustomer(customer:Customer){setSelectedCustomer(customer);setNoteDraft(customer.notes);}
