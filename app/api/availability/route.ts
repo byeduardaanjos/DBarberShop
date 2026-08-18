@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const services = new Set(["Corte masculino", "Barba premium", "Corte + barba"]);
+const services = new Set(["Corte Tesoura", "Degradê", "Degradê Navalhado", "Barba", "Sobrancelha", "Tesoura + Barba", "Degradê + Barba", "Navalhado + Barba", "Completo Tesoura", "VIP", "Supremo"]);
 
 export async function GET(request: NextRequest) {
   const date = request.nextUrl.searchParams.get("date");
