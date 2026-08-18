@@ -55,7 +55,7 @@ test.describe("Barbeiro — painel administrativo", () => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ times: ["10:00", "11:00"] }),
+        body: JSON.stringify({ available: ["10:00", "11:00"] }),
       });
     });
 
