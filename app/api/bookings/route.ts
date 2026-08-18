@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHash, randomUUID } from "node:crypto";
 
 const services = new Set(["Corte masculino", "Barba premium", "Corte + barba"]);
-const times = new Set(["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"]);
+const times = new Set(["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"]);
 
 export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => null)) as null | { service?: string; date?: string; time?: string; name?: string; phone?: string; privacyAccepted?: boolean };
