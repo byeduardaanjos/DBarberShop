@@ -4,7 +4,7 @@ test.describe("API pública — validação sem gravações", () => {
   test("recusa agendamento incompleto antes de acessar o banco", async ({ request }) => {
     const response = await request.post("/api/bookings", {
       data: {
-        service: "Corte Tesoura",
+        services: ["Degradê"],
         date: "2030-01-02",
         time: "10:00",
         name: "Cliente Teste",
@@ -22,7 +22,7 @@ test.describe("API pública — validação sem gravações", () => {
   test("recusa serviço e horário fora da lista permitida", async ({ request }) => {
     const response = await request.post("/api/bookings", {
       data: {
-        service: "Serviço inventado",
+        services: ["Serviço inventado"],
         date: "2030-01-02",
         time: "10:30",
         name: "Cliente Teste",
