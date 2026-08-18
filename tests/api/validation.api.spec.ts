@@ -4,7 +4,7 @@ test.describe("API pública — validação sem gravações", () => {
   test("recusa agendamento incompleto antes de acessar o banco", async ({ request }) => {
     const response = await request.post("/api/bookings", {
       data: {
-        service: "Corte masculino",
+        service: "Corte Tesoura",
         date: "2030-01-02",
         time: "10:00",
         name: "Cliente Teste",
