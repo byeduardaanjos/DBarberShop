@@ -63,6 +63,7 @@ export async function loginBarber(email: string, password: string) {
     headers: { apikey: key, "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
     cache: "no-store",
+    signal: AbortSignal.timeout(8_000),
   });
   if (!response.ok) return null;
   const session = (await response.json()) as TokenResponse;
