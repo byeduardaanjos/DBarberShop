@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHash, randomUUID } from "node:crypto";
 
-const services = new Set(["Corte Tesoura", "Degradê", "Degradê Navalhado", "Barba", "Sobrancelha", "Tesoura + Barba", "Degradê + Barba", "Navalhado + Barba", "Completo Tesoura", "VIP", "Supremo"]);
+const services = new Set(["Corte Tesoura", "Degradê", "Degradê Navalhado", "Barba", "Sobrancelha", "Tesoura + Barba", "Degradê + Barba", "Navalhado + Barba", "Completo Tesoura", "Degradê + Barba + Sobrancelha", "Degradê Navalhado + Barba + Sobrancelha"]);
 const times = new Set(["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"]);
 
 export async function POST(request: NextRequest) {
