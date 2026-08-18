@@ -72,7 +72,7 @@ $function$;
 revoke all on function public.get_available_booking_times(date,text) from public,authenticated;
 grant execute on function public.get_available_booking_times(date,text) to anon;
 create function public.get_available_booking_times(p_date date) returns table(booking_time time without time zone) language sql stable security definer set search_path='' as $function$
-select * from public.get_available_booking_times(p_date,'Corte masculino');
+select * from public.get_available_booking_times(p_date,'Corte Tesoura');
 $function$;
 revoke all on function public.get_available_booking_times(date) from public,authenticated;
 grant execute on function public.get_available_booking_times(date) to anon;
