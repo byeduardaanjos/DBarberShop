@@ -54,7 +54,7 @@ declare
   v_service_id uuid; v_booking_id uuid; v_customer_id uuid; v_phone_normalized text;
 begin
   if p_booking_date < current_date or extract(dow from p_booking_date) = 0 then raise exception 'invalid_date'; end if;
-  if p_booking_time not in ('09:00'::time,'10:00'::time,'11:00'::time,'12:00'::time,'13:00'::time,'14:00'::time,'15:00'::time,'16:00'::time,'17:00'::time,'18:00'::time,'19:00'::time) then raise exception 'invalid_time'; end if;
+  if p_booking_time not in ('08:00'::time,'09:00'::time,'10:00'::time,'11:00'::time,'12:00'::time,'13:00'::time,'14:00'::time,'15:00'::time,'16:00'::time,'17:00'::time) then raise exception 'invalid_time'; end if;
   if char_length(trim(p_customer_name)) not between 2 and 100 or char_length(trim(p_customer_phone)) not between 10 and 30 then raise exception 'invalid_customer'; end if;
   v_phone_normalized := regexp_replace(p_customer_phone, '[^0-9]', '', 'g');
   if char_length(v_phone_normalized) not between 10 and 15 then raise exception 'invalid_customer'; end if;
