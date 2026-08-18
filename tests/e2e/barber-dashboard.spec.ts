@@ -29,7 +29,7 @@ test.describe("Barbeiro — painel administrativo", () => {
             booking_date: "2030-01-02",
             booking_time: "10:00:00",
             status: "confirmed",
-            services: { name: "Corte masculino", duration_minutes: 50 },
+            services: { name: "Corte Tesoura", duration_minutes: 60 },
           }],
         }),
       });
