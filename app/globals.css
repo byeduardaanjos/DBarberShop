@@ -48,6 +48,16 @@
 .service-meta strong,.service-body button{color:var(--gold-light)}
 .outline-cta{color:var(--gold-light);border-color:var(--gold)}
 .booking-summary{border-left-color:var(--gold)}
+.service-assistant{margin:22px 0 8px;padding:18px;background:#0d0d0d;border:1px solid rgba(208,180,120,.3)}
+.service-assistant-intro{display:grid;grid-template-columns:42px 1fr;gap:13px;align-items:start;padding-bottom:16px;border-bottom:1px solid #2c2c2c}
+.service-assistant-intro>span{width:40px;height:40px;display:grid;place-items:center;color:#0b0b0b;background:var(--gold-light)}
+.service-assistant-intro svg{width:19px}.service-assistant-intro small,.service-command small{color:var(--gold-light);font-size:8px;font-weight:700;letter-spacing:.16em}
+.service-assistant-intro h3{margin:5px 0 3px;font-family:'Playfair Display',serif;font-size:22px}.service-assistant-intro p{margin:0;color:#777;font-size:11px;line-height:1.5}
+.service-choice-list{display:grid;margin-top:8px}.service-choice-list button{min-height:48px;padding:0 8px;display:grid;grid-template-columns:25px 1fr auto;align-items:center;gap:9px;color:#c8c5bf;background:transparent;border:0;border-bottom:1px solid #292929;text-align:left}
+.service-choice-list button:last-child{border-bottom:0}.service-choice-list button.selected{color:#f0e9dc;background:rgba(208,180,120,.06)}.service-choice-list strong{font-size:12px}.service-choice-list em{color:#d6ba78;font-size:12px;font-style:normal;font-weight:700}
+.service-choice-check{width:18px;height:18px;display:grid;place-items:center;border:1px solid #555}.service-choice-list .selected .service-choice-check{color:#0b0b0b;background:var(--gold-light);border-color:var(--gold-light)}.service-choice-check svg{width:12px}
+.service-command{margin-top:14px;padding:14px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;background:#151515;border-left:2px solid var(--gold-light)}.service-command>span{display:grid;gap:5px}.service-command>span:first-child{max-width:70%}.service-command strong{font-size:12px;line-height:1.45}.service-command>span:last-child{text-align:right}.service-command>span:last-child strong{color:var(--gold-light);font-family:'Playfair Display',serif;font-size:20px;white-space:nowrap}
+@media(max-width:600px){.service-assistant{padding:13px}.service-assistant-intro{grid-template-columns:36px 1fr}.service-assistant-intro>span{width:34px;height:34px}.service-choice-list button{min-height:44px}.service-command{align-items:stretch;flex-direction:column}.service-command>span:first-child{max-width:none}.service-command>span:last-child{text-align:left}}
 .time-grid button.selected,.success-mark{color:#111;background:var(--gold-light);border-color:var(--gold-light)}
 @media(max-width:800px){.menu-toggle{border-color:var(--gold)}}
 
