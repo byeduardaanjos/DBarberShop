@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { CalendarDays, Check, Clock3, LoaderCircle, Plus, UserRound, X } from "lucide-react";
+import { CalendarDays, Check, Clock3, LoaderCircle, UserRound, X } from "lucide-react";
 
 const services = [
   { name: "Corte Tesoura", price: 3500 },
@@ -85,5 +85,5 @@ export default function BarberBookingModal({open,initialDate,onClose,onCreated}:
 }
 
 export function NewBookingButton({onClick}:{onClick:()=>void}){
-  return <button className="barber-new-booking" type="button" onClick={onClick}><Plus/>Novo agendamento</button>;
+  return <button className="barber-new-booking" type="button" onClick={onClick}><CalendarDays/>Novo agendamento</button>;
 }
