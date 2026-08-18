@@ -2,11 +2,17 @@ import InnerHeader from "../components/InnerHeader";
 import { ArrowRight, Clock3 } from "lucide-react";
 
 const services = [
-  { name: "Degradê", detail: "Transição precisa e acabamento alinhado.", time: "60 min", price: "R$ 35", image: "/images/imperium-hero-v3.webp" },
-  { name: "Degradê Navalhado", detail: "Degradê rente com acabamento navalhado.", time: "60 min", price: "R$ 40", image: "/images/imperium-barba-v3.webp" },
-  { name: "Sobrancelha", detail: "Limpeza e alinhamento para um visual cuidado.", time: "60 min", price: "R$ 10", image: "/images/imperium-ambiente-v3.webp" },
+  { name: "Corte Tesoura", detail: "Corte clássico feito inteiramente na tesoura.", time: "60 min", price: "R$ 35", image: "/images/imperium-hero-v3.webp" },
+  { name: "Degradê", detail: "Transição precisa e acabamento alinhado.", time: "60 min", price: "R$ 40", image: "/images/imperium-barba-v3.webp" },
+  { name: "Degradê Navalhado", detail: "Degradê rente com acabamento navalhado.", time: "60 min", price: "R$ 45", image: "/images/imperium-ambiente-v3.webp" },
   { name: "Barba", detail: "Desenho, alinhamento e acabamento da barba.", time: "60 min", price: "R$ 15", image: "/images/imperium-barba-v3.webp" },
-  { name: "Corte na Tesoura", detail: "Corte clássico feito inteiramente na tesoura.", time: "60 min", price: "R$ 35", image: "/images/imperium-hero-v3.webp" },
+  { name: "Sobrancelha", detail: "Limpeza e alinhamento para um visual cuidado.", time: "60 min", price: "R$ 10", image: "/images/imperium-hero-v3.webp" },
+  { name: "Tesoura + Barba", detail: "Corte na tesoura combinado ao cuidado da barba.", time: "60 min", price: "R$ 50", image: "/images/imperium-ambiente-v3.webp" },
+  { name: "Degradê + Barba", detail: "Degradê preciso com barba alinhada.", time: "60 min", price: "R$ 55", image: "/images/imperium-hero-v3.webp" },
+  { name: "Navalhado + Barba", detail: "Degradê navalhado e acabamento completo da barba.", time: "60 min", price: "R$ 60", image: "/images/imperium-barba-v3.webp" },
+  { name: "Completo Tesoura", detail: "Tesoura, barba e sobrancelha em um atendimento completo.", time: "60 min", price: "R$ 60", image: "/images/imperium-ambiente-v3.webp" },
+  { name: "VIP", detail: "Degradê, barba e sobrancelha com acabamento premium.", time: "60 min", price: "R$ 65", image: "/images/imperium-hero-v3.webp" },
+  { name: "Supremo", detail: "Navalhado, barba e sobrancelha: a experiência máxima.", time: "60 min", price: "R$ 70", image: "/images/imperium-barba-v3.webp" },
 ];
 
 export default function ServicesPage() {
