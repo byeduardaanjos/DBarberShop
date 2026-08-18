@@ -45,7 +45,7 @@ export default function BarberBookingModal({open,initialDate,onClose,onCreated}:
     setLoadingTimes(true);setTime("");setMessage("");
     fetch(`/api/availability?date=${encodeURIComponent(date)}&service=${encodeURIComponent(service)}`,{cache:"no-store",signal:controller.signal})
       .then(async response=>({ok:response.ok,data:await response.json()}))
-      .then(({ok,data})=>{if(ok)setAvailableTimes(data.times??[]);else setMessage(data.error??"Não foi possível consultar os horários.");})
+      .then(({ok,data})=>{if(ok)setAvailableTimes(data.available??[]);else setMessage(data.error??"Não foi possível consultar os horários.");})
       .catch(error=>{if(error?.name!=="AbortError")setMessage("Não foi possível consultar os horários.");})
       .finally(()=>setLoadingTimes(false));
     return()=>controller.abort();
