@@ -61,4 +61,19 @@ test.describe("API pública — validação sem gravações", () => {
     expect(response.status()).toBe(401);
     await expect(response.json()).resolves.toEqual({ error: "Não autorizado." });
   });
+
+  test("protege o agendamento criado pelo barbeiro sem sessão", async ({ request }) => {
+    const response = await request.post("/api/barbeiro/agendamentos", {
+      data: {
+        service: "Degradê",
+        date: "2030-01-02",
+        time: "10:00",
+        name: "Cliente WhatsApp",
+        phone: "48999999999",
+      },
+    });
+
+    expect(response.status()).toBe(401);
+    await expect(response.json()).resolves.toEqual({ error: "Não autorizado." });
+  });
 });

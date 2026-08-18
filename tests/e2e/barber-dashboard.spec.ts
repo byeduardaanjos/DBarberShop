@@ -51,10 +51,28 @@ test.describe("Barbeiro — painel administrativo", () => {
         }),
       });
     });
+    await page.route("**/api/availability?*", async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ times: ["10:00", "11:00"] }),
+      });
+    });
 
     await page.goto("/barbeiro");
+    await expect(page.getByAltText("D.BarberShop").first()).toBeVisible();
     if (!isMobile) await expect(page.getByText("CENTRAL ONLINE")).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Navegação do painel" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Novo agendamento" }).click();
+    const dialog = page.getByRole("dialog", { name: "Novo horário." });
+    await expect(dialog).toBeVisible();
+    await dialog.getByLabel("Nome do cliente").fill("Cliente WhatsApp");
+    await dialog.getByLabel("WhatsApp").fill("48999999999");
+    await dialog.getByRole("button", { name: "10:00" }).click();
+    await expect(dialog.getByRole("button", { name: "Confirmar agendamento" })).toBeEnabled();
+    await dialog.getByRole("button", { name: "Fechar" }).click();
+
     await page.getByRole("button", { name: /Clientes/ }).click();
     await expect(page.getByText("Cliente Painel", { exact: true })).toBeVisible();
     await expect(page.getByText("Histórico e preferências salvos automaticamente a cada agendamento.")).toBeVisible();
