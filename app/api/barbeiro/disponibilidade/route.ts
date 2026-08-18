@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireBarber } from "@/lib/barber-auth";
 
-const times=new Set(["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00"]);
+const times=new Set(["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"]);
 function config(){const url=process.env.SUPABASE_URL;const key=process.env.SUPABASE_PUBLISHABLE_KEY;return url&&key?{url,key}:null;}
 
 export async function GET(){const session=await requireBarber().catch(()=>null);if(!session)return NextResponse.json({error:"Não autorizado."},{status:401});const supabase=config();if(!supabase)return NextResponse.json({error:"Banco não configurado."},{status:503});const today=new Date().toISOString().slice(0,10);const query=new URLSearchParams({select:"id,block_date,block_time,reason,created_at",block_date:`gte.${today}`,order:"block_date.asc,block_time.asc"});const response=await fetch(`${supabase.url}/rest/v1/availability_blocks?${query}`,{headers:{apikey:supabase.key,Authorization:`Bearer ${session.accessToken}`},cache:"no-store"});if(!response.ok)return NextResponse.json({error:"Não foi possível carregar os bloqueios."},{status:502});return NextResponse.json({blocks:await response.json()});}
