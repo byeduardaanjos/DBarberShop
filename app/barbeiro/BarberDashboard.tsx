@@ -34,7 +34,15 @@ export default function BarberDashboard(){
   const loadUpcoming=useCallback(async()=>{const response=await fetch(`/api/barbeiro/agendamentos?scope=upcoming&from=${today()}`,{cache:"no-store"});if(response.status===401)return;const data=await response.json();if(response.ok)setUpcomingBookings(data.bookings);},[]);
   const loadCustomers=useCallback(async(quiet=false)=>{ if(!quiet)setCustomersLoading(true); const response=await fetch("/api/barbeiro/clientes",{cache:"no-store"}); if(response.status===401){setAuth("guest");setCustomers([]);setCustomersLoading(false);return;} const data=await response.json(); if(response.ok)setCustomers(data.customers);else setMessage(data.error??"Não foi possível carregar os clientes."); if(!quiet)setCustomersLoading(false);},[]);
 
-  useEffect(()=>{fetch("/api/barbeiro/session",{cache:"no-store"}).then(async response=>{if(response.ok){setAuth("barber");await Promise.all([loadBookings(date),loadUpcoming()]);}else setAuth("guest");});},[date,loadBookings,loadUpcoming]);
+  useEffect(()=>{
+    const controller=new AbortController();
+    const timeout=window.setTimeout(()=>controller.abort(),6_000);
+    fetch("/api/barbeiro/session",{cache:"no-store",signal:controller.signal})
+      .then(async response=>{if(response.ok){setAuth("barber");void Promise.allSettled([loadBookings(date),loadUpcoming()]);}else setAuth("guest");})
+      .catch(()=>setAuth("guest"))
+      .finally(()=>window.clearTimeout(timeout));
+    return()=>{window.clearTimeout(timeout);controller.abort();};
+  },[date,loadBookings,loadUpcoming]);
   useEffect(()=>{if(auth!=="barber")return;const timer=window.setInterval(()=>{loadBookings(date,true);loadUpcoming();},30000);return()=>window.clearInterval(timer);},[auth,date,loadBookings,loadUpcoming]);
   useEffect(()=>{if(auth==="barber"&&view==="customers"&&customers.length===0)loadCustomers();},[auth,customers.length,loadCustomers,view]);
 
