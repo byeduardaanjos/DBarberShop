@@ -32,6 +32,7 @@ async function fetchUser(accessToken: string) {
   const response = await fetch(`${url}/auth/v1/user`, {
     headers: { apikey: key, Authorization: `Bearer ${accessToken}` },
     cache: "no-store",
+    signal: AbortSignal.timeout(6_000),
   });
   if (!response.ok) return null;
   return (await response.json()) as SupabaseUser;
@@ -88,6 +89,7 @@ export async function requireBarber() {
     headers: { apikey: key, "Content-Type": "application/json" },
     body: JSON.stringify({ refresh_token: refreshToken }),
     cache: "no-store",
+    signal: AbortSignal.timeout(8_000),
   });
   if (!response.ok) {
     await clearBarberSession();
