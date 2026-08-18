@@ -4,9 +4,17 @@ import { ArrowDown, ArrowLeft, ArrowRight, CalendarDays, Check, Clock3, Download
 import PremiumCalendar from "./components/PremiumCalendar";
 
 const services = [
-  { name: "Corte masculino", detail: "Corte personalizado com acabamento preciso.", time: "50 min", price: "R$ 65", image: "/images/imperium-hero-v3.webp" },
-  { name: "Barba premium", detail: "Modelagem, toalha quente e finalização.", time: "35 min", price: "R$ 45", image: "/images/imperium-barba-v3.webp" },
-  { name: "Corte + barba", detail: "A experiência completa para renovar o visual.", time: "80 min", price: "R$ 100", image: "/images/imperium-ambiente-v3.webp" },
+  { name: "Corte Tesoura", detail: "Corte clássico feito inteiramente na tesoura.", time: "60 min", price: "R$ 35", image: "/images/imperium-hero-v3.webp" },
+  { name: "Degradê", detail: "Transição precisa e acabamento alinhado.", time: "60 min", price: "R$ 40", image: "/images/imperium-barba-v3.webp" },
+  { name: "Degradê Navalhado", detail: "Degradê rente com acabamento navalhado.", time: "60 min", price: "R$ 45", image: "/images/imperium-ambiente-v3.webp" },
+  { name: "Barba", detail: "Desenho, alinhamento e acabamento da barba.", time: "60 min", price: "R$ 15", image: "/images/imperium-barba-v3.webp" },
+  { name: "Sobrancelha", detail: "Limpeza e alinhamento para um visual cuidado.", time: "60 min", price: "R$ 10", image: "/images/imperium-hero-v3.webp" },
+  { name: "Tesoura + Barba", detail: "Corte na tesoura combinado ao cuidado da barba.", time: "60 min", price: "R$ 50", image: "/images/imperium-ambiente-v3.webp" },
+  { name: "Degradê + Barba", detail: "Degradê preciso com barba alinhada.", time: "60 min", price: "R$ 55", image: "/images/imperium-hero-v3.webp" },
+  { name: "Navalhado + Barba", detail: "Degradê navalhado e acabamento completo da barba.", time: "60 min", price: "R$ 60", image: "/images/imperium-barba-v3.webp" },
+  { name: "Completo Tesoura", detail: "Tesoura, barba e sobrancelha em um atendimento completo.", time: "60 min", price: "R$ 60", image: "/images/imperium-ambiente-v3.webp" },
+  { name: "VIP", detail: "Degradê, barba e sobrancelha com acabamento premium.", time: "60 min", price: "R$ 65", image: "/images/imperium-hero-v3.webp" },
+  { name: "Supremo", detail: "Navalhado, barba e sobrancelha: a experiência máxima.", time: "60 min", price: "R$ 70", image: "/images/imperium-barba-v3.webp" },
 ];
 const times = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 

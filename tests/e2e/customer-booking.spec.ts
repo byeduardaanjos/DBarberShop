@@ -64,7 +64,7 @@ test.describe("Cliente — agendamento", () => {
       `/agendamento/${bookingId}#token=${manageToken}`,
     );
     expect(submittedBody).toMatchObject({
-      service: "Corte masculino",
+      service: "Corte Tesoura",
       time: "10:00",
       name: "Cliente QA",
       phone: "(48) 99999-9999",

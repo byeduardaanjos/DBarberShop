@@ -8,8 +8,8 @@ const originalBooking = {
   booking_date: "2030-01-02",
   booking_time: "10:00:00",
   status: "confirmed",
-  service_name: "Corte masculino",
-  duration_minutes: 50,
+  service_name: "Corte Tesoura",
+  duration_minutes: 60,
 };
 
 test.describe("Cliente — autogestão do agendamento", () => {
@@ -60,6 +60,6 @@ test.describe("Cliente — autogestão do agendamento", () => {
     await expect(page.getByRole("button", { name: "10:00" })).toBeDisabled();
     await page.getByRole("button", { name: "15:00" }).click();
     await page.getByRole("button", { name: /Confirmar novo horário/ }).click();
-    await expect(page.getByText("15:00 · 50 min")).toBeVisible();
+    await expect(page.getByText("15:00 · 60 min")).toBeVisible();
   });
 });
