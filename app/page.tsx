@@ -13,8 +13,8 @@ const services = [
   { name: "Degradê + Barba", detail: "Degradê preciso com barba alinhada.", time: "60 min", price: "R$ 55", priceCents: 5500, image: "/images/imperium-hero-v3.webp" },
   { name: "Navalhado + Barba", detail: "Degradê navalhado e acabamento completo da barba.", time: "60 min", price: "R$ 60", priceCents: 6000, image: "/images/imperium-barba-v3.webp" },
   { name: "Completo Tesoura", detail: "Tesoura, barba e sobrancelha em um atendimento completo.", time: "60 min", price: "R$ 60", priceCents: 6000, image: "/images/imperium-ambiente-v3.webp" },
-  { name: "VIP", detail: "Degradê, barba e sobrancelha com acabamento premium.", time: "60 min", price: "R$ 65", priceCents: 6500, image: "/images/imperium-hero-v3.webp" },
-  { name: "Supremo", detail: "Navalhado, barba e sobrancelha: a experiência máxima.", time: "60 min", price: "R$ 70", priceCents: 7000, image: "/images/imperium-barba-v3.webp" },
+  { name: "Degradê + Barba + Sobrancelha", detail: "Atendimento completo com acabamento premium.", time: "60 min", price: "R$ 65", priceCents: 6500, image: "/images/imperium-hero-v3.webp" },
+  { name: "Degradê Navalhado + Barba + Sobrancelha", detail: "Atendimento completo com acabamento navalhado.", time: "60 min", price: "R$ 70", priceCents: 7000, image: "/images/imperium-barba-v3.webp" },
 ];
 const times = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
