@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   const validDate = date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : fallbackDate;
   const validFrom = from && /^\d{4}-\d{2}-\d{2}$/.test(from) ? from : fallbackDate;
   const query = new URLSearchParams({
-    select: "id,customer_name,customer_phone,booking_date,booking_time,status,created_at,services(name,duration_minutes)",
+    select: "id,customer_name,customer_phone,booking_date,booking_time,status,created_at,selected_services,total_price_cents,services(name,duration_minutes)",
     booking_date: upcoming ? `gte.${validFrom}` : `eq.${validDate}`,
     order: upcoming ? "booking_date.asc,booking_time.asc" : "booking_time.asc",
   });
