@@ -44,6 +44,8 @@ test.describe("Cliente — agendamento", () => {
     await page.goto("/?agendar=1");
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByRole("heading", { name: "Escolha seu horário." })).toBeVisible();
+    await dialog.getByRole("button", { name: /Barba R\$ 15/ }).click();
+    await expect(dialog.getByText("R$ 50,00")).toBeVisible();
 
     await dialog.locator(".calendar-grid button:not([disabled])").first().click();
     await dialog.getByRole("button", { name: "10:00" }).click();
@@ -64,7 +66,7 @@ test.describe("Cliente — agendamento", () => {
       `/agendamento/${bookingId}#token=${manageToken}`,
     );
     expect(submittedBody).toMatchObject({
-      service: "Corte Tesoura",
+      services: ["Degradê", "Barba"],
       time: "10:00",
       name: "Cliente QA",
       phone: "(48) 99999-9999",
