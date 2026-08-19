@@ -655,3 +655,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   .gallery-empty-actions{flex-direction:column}
   .gallery-empty-actions a{width:100%}
 }
+@media(max-width:760px) and (hover:none){
+  .gallery-coming-soon,.gallery-empty{background-size:180% 180%}
+  .primary-cta,.outline-cta,.contact-action,.service-card{touch-action:manipulation;will-change:transform}
+}
