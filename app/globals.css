@@ -459,6 +459,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   background:#0d0d0d;
   border:1px solid rgba(200,164,93,.3);
 }
+.calendar-fieldset .premium-calendar{width:100%;max-width:none}
 .calendar-header{
   display:grid;
   grid-template-columns:40px 1fr 40px;
@@ -554,6 +555,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .time-grid button:disabled{opacity:.3;cursor:not-allowed}
 @media(max-width:800px){
   .premium-calendar{width:min(100%,270px);padding:8px}
+  .calendar-fieldset .premium-calendar{width:100%;padding:12px}
   .calendar-header{
     grid-template-columns:32px 1fr 32px;
     margin-bottom:8px;
