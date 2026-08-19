@@ -345,6 +345,7 @@ textarea{font:inherit}
 
 /* Final UX polish */
 .nav-book{display:none}
+.nav a.nav-manage{padding-bottom:5px;color:var(--gold-light);border-bottom:1px solid rgba(200,164,93,.48)}
 .header-cta.inner-cta{display:flex;align-items:center;justify-content:center;text-decoration:none}
 .whatsapp-card .primary-cta{text-decoration:none}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold-light);outline-offset:3px}
