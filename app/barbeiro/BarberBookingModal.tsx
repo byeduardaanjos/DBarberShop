@@ -5,16 +5,11 @@ import { CalendarDays, Check, Clock3, LoaderCircle, UserRound, X } from "lucide-
 
 const services = [
   { name: "Corte Tesoura", price: 3500 },
-  { name: "Degradê", price: 4000 },
-  { name: "Degradê Navalhado", price: 4500 },
-  { name: "Barba", price: 1000 },
-  { name: "Sobrancelha", price: 500 },
-  { name: "Tesoura + Barba", price: 4500 },
-  { name: "Degradê + Barba", price: 5000 },
-  { name: "Navalhado + Barba", price: 5500 },
-  { name: "Completo Tesoura", price: 5000 },
-  { name: "Degradê + Barba + Sobrancelha", price: 5500 },
-  { name: "Degradê Navalhado + Barba + Sobrancelha", price: 6000 },
+  { name: "Barba", price: 1500 },
+  { name: "Sobrancelha", price: 1000 },
+  { name: "Corte + Barba", price: 4500 },
+  { name: "Corte + Sobrancelha", price: 4500 },
+  { name: "Corte + Barba + Sobrancelha", price: 5000 },
 ];
 const allTimes = ["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00"];
 const today = () => { const value=new Date(); return new Date(value.getTime()-value.getTimezoneOffset()*60000).toISOString().slice(0,10); };
