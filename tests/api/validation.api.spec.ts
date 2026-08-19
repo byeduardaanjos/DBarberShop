@@ -4,7 +4,7 @@ test.describe("API pública — validação sem gravações", () => {
   test("recusa agendamento incompleto antes de acessar o banco", async ({ request }) => {
     const response = await request.post("/api/bookings", {
       data: {
-        services: ["Degradê"],
+        services: ["Corte Tesoura"],
         date: "2030-01-02",
         time: "10:00",
         name: "Cliente Teste",
@@ -65,7 +65,7 @@ test.describe("API pública — validação sem gravações", () => {
   test("protege o agendamento criado pelo barbeiro sem sessão", async ({ request }) => {
     const response = await request.post("/api/barbeiro/agendamentos", {
       data: {
-        service: "Degradê",
+        service: "Corte Tesoura",
         date: "2030-01-02",
         time: "10:00",
         name: "Cliente WhatsApp",
