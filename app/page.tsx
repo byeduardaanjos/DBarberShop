@@ -19,6 +19,10 @@ const services = [
 const times = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
 type ConfirmedBooking = { id: string; manageToken: string; services: string[]; totalPriceCents: number; date: string; time: string; name: string };
+type SavedBooking = { id: string; manageToken: string; savedAt: number };
+
+const savedBookingKey = "dbarbershop:last-booking";
+const savedBookingLifetime = 90 * 24 * 60 * 60 * 1000;
 
 function formatBookingDate(value: string) {
   return new Date(`${value}T12:00:00`).toLocaleDateString("pt-BR", {
@@ -45,6 +49,7 @@ export default function Home() {
   const [bookingError, setBookingError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState<ConfirmedBooking | null>(null);
+  const [savedBookingUrl, setSavedBookingUrl] = useState("");
   const totalPriceCents = selectedServices.reduce((total, name) => total + (services.find(item => item.name === name)?.priceCents ?? 0), 0);
   function openBooking(selected?: string) { if (selected) setSelectedServices([selected]); setBookingOpen(true); setMenuOpen(false); setConfirmedBooking(null); setPrivacyAccepted(false); setBookingError(""); setStep(1); }
   async function loadAvailability(selectedDate: string, selectedService = selectedServices[0]) {
@@ -63,7 +68,12 @@ export default function Home() {
       const response = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ services: selectedServices, date, time, name, phone, privacyAccepted }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
-      setConfirmedBooking({ id: result.bookingId, manageToken: result.manageToken, services: selectedServices, totalPriceCents, date, time, name: name.trim() });
+      const confirmed = { id: result.bookingId, manageToken: result.manageToken, services: selectedServices, totalPriceCents, date, time, name: name.trim() };
+      const saved: SavedBooking = { id: result.bookingId, manageToken: result.manageToken, savedAt: Date.now() };
+      const managePath = `/agendamento/${saved.id}#token=${encodeURIComponent(saved.manageToken)}`;
+      localStorage.setItem(savedBookingKey, JSON.stringify(saved));
+      setSavedBookingUrl(managePath);
+      setConfirmedBooking(confirmed);
       setStep(3);
     } catch (error) { setBookingError(error instanceof Error ? error.message : "Não foi possível concluir o agendamento."); }
     finally { setSubmitting(false); }
@@ -72,13 +82,21 @@ export default function Home() {
   const whatsappConfirmation = confirmedBooking
     ? `https://wa.me/5548991659709?text=${encodeURIComponent(`Agendamento confirmado na D.BarberShop\n\n${confirmedBooking.services.join(" + ")}\nTotal: ${(confirmedBooking.totalPriceCents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}\n${formatBookingDate(confirmedBooking.date)} às ${confirmedBooking.time}\nCódigo: ${bookingCode(confirmedBooking.id)}\nCliente: ${confirmedBooking.name}\n\nGerenciar: ${manageUrl}`)}`
     : "#";
-  useEffect(() => { const params = new URLSearchParams(window.location.search); const selected = params.get("servico"); if (selected && services.some(item => item.name === selected)) openBooking(selected); else if (params.get("agendar") === "1") openBooking(); }, []);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(savedBookingKey) ?? "null") as SavedBooking | null;
+      const valid = saved && /^[0-9a-f-]{36}$/i.test(saved.id) && saved.manageToken.length === 72 && Date.now() - saved.savedAt < savedBookingLifetime;
+      if (valid) setSavedBookingUrl(`/agendamento/${saved.id}#token=${encodeURIComponent(saved.manageToken)}`);
+      else localStorage.removeItem(savedBookingKey);
+    } catch { localStorage.removeItem(savedBookingKey); }
+    const params = new URLSearchParams(window.location.search); const selected = params.get("servico"); if (selected && services.some(item => item.name === selected)) openBooking(selected); else if (params.get("agendar") === "1") openBooking();
+  }, []);
 
   return <main>
     <header className="site-header">
       <a href="/" className="brand brand-logo" aria-label="Página inicial da D.BarberShop"><img src="/images/dbarbershop-wordmark.webp" alt="D.BarberShop"/></a>
       <button className={menuOpen ? "menu-toggle open" : "menu-toggle"} onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen}>{menuOpen ? <X/> : <Menu/>}</button>
-      <nav className={menuOpen ? "nav open" : "nav"}><a href="/servicos">Serviços</a><a href="/trabalhos">Trabalhos</a><a href="#sobre">Sobre</a><a href="#contato">Contato</a><a className="nav-book" href="/?agendar=1">Agendar horário</a></nav>
+      <nav className={menuOpen ? "nav open" : "nav"}><a href="/servicos">Serviços</a><a href="/trabalhos">Trabalhos</a><a href="#sobre">Sobre</a><a href="#contato">Contato</a>{savedBookingUrl&&<a className="nav-manage" href={savedBookingUrl}>Meu agendamento</a>}<a className="nav-book" href="/?agendar=1">Agendar horário</a></nav>
       <button className="header-cta" onClick={() => openBooking()}>Agendar horário</button>
     </header>
 
