@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { animate, hover, inView, scroll, stagger } from "motion";
+import { animate, hover, inView, press, scroll, stagger } from "motion";
 
 const premiumEase = [0.22, 1, 0.36, 1] as const;
 
@@ -10,6 +10,7 @@ export default function MotionEnhancements() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const cleanups: Array<() => void> = [];
+    const isTouch = window.matchMedia("(hover: none), (pointer: coarse)").matches;
     const hero = document.querySelector<HTMLElement>(".hero");
     const heroContent = document.querySelector<HTMLElement>(".hero-content");
     const heroOverlay = document.querySelector<HTMLElement>(".hero-overlay");
@@ -28,12 +29,12 @@ export default function MotionEnhancements() {
       }, { target: hero, offset: ["start start", "end start"] }));
     }
 
-    document.querySelectorAll<HTMLElement>(".section-title, .about-copy, .contact-heading, .services-page-hero").forEach((element) => {
+    document.querySelectorAll<HTMLElement>(".section-title, .about-copy, .contact-heading, .services-page-hero, .gallery-coming-soon, .gallery-empty").forEach((element) => {
       element.style.opacity = "0";
-      element.style.filter = "blur(6px)";
-      element.style.transform = "translateY(46px)";
+      element.style.filter = isTouch ? "blur(3px)" : "blur(6px)";
+      element.style.transform = `translateY(${isTouch ? 30 : 46}px)`;
       cleanups.push(inView(element, () => {
-        animate(element, { opacity: 1, filter: "blur(0px)", transform: "translateY(0)" }, { duration: 0.95, ease: premiumEase });
+        animate(element, { opacity: 1, filter: "blur(0px)", transform: "translateY(0)" }, { duration: isTouch ? 0.78 : 0.95, ease: premiumEase });
       }, { margin: "0px 0px -10% 0px", amount: 0.18 }));
     });
 
@@ -57,11 +58,27 @@ export default function MotionEnhancements() {
     });
 
     document.querySelectorAll<HTMLElement>(".primary-cta, .outline-cta, .contact-action, .service-card").forEach((element) => {
-      cleanups.push(hover(element, () => {
-        animate(element, { transform: "translateY(-3px) scale(1.012)" }, { duration: 0.24, ease: "easeOut" });
-        return () => animate(element, { transform: "translateY(0) scale(1)" }, { duration: 0.3, ease: "easeOut" });
-      }));
+      if (isTouch) {
+        cleanups.push(press(element, () => {
+          animate(element, { transform: "scale(.975)" }, { duration: 0.12, ease: "easeOut" });
+          return () => animate(element, { transform: "scale(1)" }, { duration: 0.28, ease: premiumEase });
+        }));
+      } else {
+        cleanups.push(hover(element, () => {
+          animate(element, { transform: "translateY(-3px) scale(1.012)" }, { duration: 0.24, ease: "easeOut" });
+          return () => animate(element, { transform: "translateY(0) scale(1)" }, { duration: 0.3, ease: "easeOut" });
+        }));
+      }
     });
+
+    if (isTouch) {
+      document.querySelectorAll<HTMLElement>(".gallery-coming-soon, .gallery-empty").forEach((panel) => {
+        cleanups.push(scroll((progress: number) => {
+          const position = 24 + progress * 52;
+          panel.style.backgroundPosition = `${position}% ${position}%`;
+        }, { target: panel, offset: ["start end", "end start"] }));
+      });
+    }
 
     return () => cleanups.forEach((cleanup) => cleanup());
   }, []);
