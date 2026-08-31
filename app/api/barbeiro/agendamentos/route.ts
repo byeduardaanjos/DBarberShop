@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireBarber } from "@/lib/barber-auth";
 
 const statuses = new Set(["confirmed", "completed", "cancelled", "no_show"]);
-const services = new Set(["Corte Tesoura", "Barba", "Sobrancelha", "Corte + Barba", "Corte + Sobrancelha", "Corte + Barba + Sobrancelha"]);
+const services = new Set(["Barba", "Corte", "Corte de Tesoura", "Sobrancelha", "Corte + Sobrancelha", "Corte + Sobrancelha + Barba"]);
 const times = new Set(["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"]);
 
 function supabaseConfig() {

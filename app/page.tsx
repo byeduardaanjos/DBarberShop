@@ -4,12 +4,12 @@ import { ArrowDown, ArrowLeft, ArrowRight, CalendarDays, Check, Clock3, Hash, In
 import PremiumCalendar from "./components/PremiumCalendar";
 
 const services = [
-  { name: "Corte Tesoura", detail: "Corte clássico feito inteiramente na tesoura.", time: "60 min", price: "R$ 35", priceCents: 3500, image: "/images/imperium-hero-v3.webp" },
-  { name: "Barba", detail: "Desenho, alinhamento e acabamento da barba.", time: "60 min", price: "R$ 15", priceCents: 1500, image: "/images/imperium-barba-v3.webp" },
+  { name: "Barba", detail: "Desenho, alinhamento e acabamento da barba.", time: "60 min", price: "R$ 30", priceCents: 3000, image: "/images/imperium-barba-v3.webp" },
+  { name: "Corte", detail: "Corte masculino com acabamento preciso e personalizado.", time: "60 min", price: "R$ 40", priceCents: 4000, image: "/images/imperium-ambiente-v3.webp" },
+  { name: "Corte de Tesoura", detail: "Corte clássico feito inteiramente na tesoura.", time: "60 min", price: "R$ 45", priceCents: 4500, image: "/images/imperium-hero-v3.webp" },
   { name: "Sobrancelha", detail: "Limpeza e alinhamento para um visual cuidado.", time: "60 min", price: "R$ 10", priceCents: 1000, image: "/images/imperium-hero-v3.webp" },
-  { name: "Corte + Barba", detail: "Corte combinado ao cuidado e acabamento da barba.", time: "60 min", price: "R$ 45", priceCents: 4500, image: "/images/imperium-ambiente-v3.webp" },
-  { name: "Corte + Sobrancelha", detail: "Corte com limpeza e alinhamento da sobrancelha.", time: "60 min", price: "R$ 45", priceCents: 4500, image: "/images/imperium-hero-v3.webp" },
-  { name: "Corte + Barba + Sobrancelha", detail: "Corte, barba e sobrancelha em um atendimento completo.", time: "60 min", price: "R$ 50", priceCents: 5000, image: "/images/imperium-barba-v3.webp" },
+  { name: "Corte + Sobrancelha", detail: "Corte com limpeza e alinhamento da sobrancelha.", time: "60 min", price: "R$ 50", priceCents: 5000, image: "/images/imperium-hero-v3.webp" },
+  { name: "Corte + Sobrancelha + Barba", detail: "Corte, sobrancelha e barba em um atendimento completo.", time: "60 min", price: "R$ 70", priceCents: 7000, image: "/images/imperium-barba-v3.webp" },
 ];
 const times = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 

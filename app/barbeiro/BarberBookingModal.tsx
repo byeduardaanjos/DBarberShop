@@ -4,12 +4,12 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { CalendarDays, Check, Clock3, LoaderCircle, UserRound, X } from "lucide-react";
 
 const services = [
-  { name: "Corte Tesoura", price: 3500 },
-  { name: "Barba", price: 1500 },
+  { name: "Barba", price: 3000 },
+  { name: "Corte", price: 4000 },
+  { name: "Corte de Tesoura", price: 4500 },
   { name: "Sobrancelha", price: 1000 },
-  { name: "Corte + Barba", price: 4500 },
-  { name: "Corte + Sobrancelha", price: 4500 },
-  { name: "Corte + Barba + Sobrancelha", price: 5000 },
+  { name: "Corte + Sobrancelha", price: 5000 },
+  { name: "Corte + Sobrancelha + Barba", price: 7000 },
 ];
 const allTimes = ["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00"];
 const today = () => { const value=new Date(); return new Date(value.getTime()-value.getTimezoneOffset()*60000).toISOString().slice(0,10); };
