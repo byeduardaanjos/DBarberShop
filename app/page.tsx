@@ -91,7 +91,7 @@ export default function Home() {
     <header className="site-header">
       <a href="/" className="brand brand-logo" aria-label="Página inicial da D.BarberShop"><img src="/images/dbarbershop-wordmark.webp" alt="D.BarberShop"/></a>
       <button className={menuOpen ? "menu-toggle open" : "menu-toggle"} onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen}>{menuOpen ? <X/> : <Menu/>}</button>
-      <nav className={menuOpen ? "nav open" : "nav"}><a href="/servicos">Serviços</a><a href="/trabalhos">Trabalhos</a><a href="#sobre">Sobre</a><a href="#contato">Contato</a>{savedBookingUrl&&<a className="nav-manage" href={savedBookingUrl}>Meu agendamento</a>}<a className="nav-book" href="/?agendar=1">Agendar horário</a></nav>
+      <nav className={menuOpen ? "nav open" : "nav"}><a href="/servicos">Serviços</a><a href="/planos">Planos</a><a href="/trabalhos">Trabalhos</a><a href="#sobre">Sobre</a><a href="#contato">Contato</a>{savedBookingUrl&&<a className="nav-manage" href={savedBookingUrl}>Meu agendamento</a>}<a className="nav-book" href="/?agendar=1">Agendar horário</a></nav>
       <button className="header-cta" onClick={() => openBooking()}>Agendar horário</button>
     </header>
 
