@@ -197,8 +197,6 @@ textarea{font:inherit}
 .monthly-plan-card{position:relative;max-width:680px;margin:auto;padding:52px;background:linear-gradient(145deg,#1c1a16,#111);border:1px solid rgba(226,199,126,.42);box-shadow:0 30px 90px rgba(0,0,0,.38)}
 .monthly-plan-card:before{position:absolute;content:"";inset:12px;border:1px solid rgba(226,199,126,.09);pointer-events:none}
 .plan-card-heading{position:relative;display:flex;align-items:center;gap:20px}
-.plan-icon{width:58px;height:58px;display:grid;place-items:center;color:#12100c;background:var(--gold-light);border-radius:50%}
-.plan-icon svg{width:25px}
 .plan-card-heading h2{margin:7px 0 0;font-family:'Playfair Display',serif;font-size:clamp(35px,5vw,52px);font-weight:600}
 .plan-price{position:relative;margin:45px 0 25px;display:flex;align-items:baseline;gap:8px;color:var(--gold-light)}
 .plan-price small{font-size:18px;font-weight:700}
@@ -220,7 +218,6 @@ textarea{font:inherit}
   .plans-catalog{padding:55px 18px 85px}
   .monthly-plan-card{padding:38px 25px 30px}
   .plan-card-heading{align-items:flex-start}
-  .plan-icon{width:50px;height:50px;flex:0 0 50px}
   .plan-price{margin-top:38px;flex-wrap:wrap}
   .plan-price span{width:100%;margin-top:8px}
 }
