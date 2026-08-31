@@ -190,12 +190,39 @@ textarea{font:inherit}
 .services-catalog{padding:90px 5vw 120px}
 .catalog-book{padding:15px 0;display:block;color:var(--gold-light);border-top:1px solid var(--line);font-size:14px;text-align:center;text-decoration:none}
 .catalog-note{max-width:700px;margin:34px auto 0;color:var(--muted);font-size:12px;text-align:center;line-height:1.6}
+
+/* Monthly plan */
+.plans-hero{padding-bottom:72px}
+.plans-catalog{padding:80px 24px 120px;background:radial-gradient(circle at 50% 0,rgba(200,164,93,.1),transparent 42%),var(--black)}
+.monthly-plan-card{position:relative;max-width:680px;margin:auto;padding:52px;background:linear-gradient(145deg,#1c1a16,#111);border:1px solid rgba(226,199,126,.42);box-shadow:0 30px 90px rgba(0,0,0,.38)}
+.monthly-plan-card:before{position:absolute;content:"";inset:12px;border:1px solid rgba(226,199,126,.09);pointer-events:none}
+.plan-card-heading{position:relative;display:flex;align-items:center;gap:20px}
+.plan-icon{width:58px;height:58px;display:grid;place-items:center;color:#12100c;background:var(--gold-light);border-radius:50%}
+.plan-icon svg{width:25px}
+.plan-card-heading h2{margin:7px 0 0;font-family:'Playfair Display',serif;font-size:clamp(35px,5vw,52px);font-weight:600}
+.plan-price{position:relative;margin:45px 0 25px;display:flex;align-items:baseline;gap:8px;color:var(--gold-light)}
+.plan-price small{font-size:18px;font-weight:700}
+.plan-price strong{font-family:'Playfair Display',serif;font-size:clamp(72px,10vw,104px);font-weight:600;line-height:.8}
+.plan-price span{color:var(--muted);font-size:14px}
+.plan-description{position:relative;max-width:520px;color:#b1ada4;line-height:1.75}
+.plan-benefits{position:relative;margin:35px 0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.plan-benefits li{padding:17px 0;display:flex;align-items:center;gap:14px;color:#cbc7bd;border-bottom:1px solid var(--line)}
+.plan-benefits svg{width:18px;color:var(--gold-light)}
+.plan-benefits strong{color:var(--white)}
+.plan-cta{position:relative;width:100%;text-decoration:none}
+.plan-note{max-width:620px;margin:28px auto 0;color:var(--muted);font-size:12px;text-align:center;line-height:1.7}
 @media(max-width:800px){
   .featured-services{grid-template-columns:1fr}
   .inner-header{height:72px;padding:0 20px}
   .inner-header .brand{font-size:20px}
   .services-page-hero{padding:85px 20px 65px}
   .services-catalog{padding:65px 20px 90px}
+  .plans-catalog{padding:55px 18px 85px}
+  .monthly-plan-card{padding:38px 25px 30px}
+  .plan-card-heading{align-items:flex-start}
+  .plan-icon{width:50px;height:50px;flex:0 0 50px}
+  .plan-price{margin-top:38px;flex-wrap:wrap}
+  .plan-price span{width:100%;margin-top:8px}
 }
 
 /* Compact work preview and full gallery */
