@@ -23,7 +23,6 @@ export default function PlansPage() {
     <section className="plans-catalog">
       <article className="monthly-plan-card">
         <div className="plan-card-heading">
-          <span className="plan-icon"><Scissors /></span>
           <div>
             <p className="eyebrow">PLANO MENSAL</p>
             <h2>PLANOS</h2>
