@@ -194,13 +194,13 @@ textarea{font:inherit}
 /* Monthly plan */
 .plans-hero{padding-bottom:72px}
 .plans-catalog{padding:80px 24px 120px;background:radial-gradient(circle at 50% 0,rgba(200,164,93,.1),transparent 42%),var(--black)}
-.monthly-plan-card{position:relative;max-width:680px;margin:auto;padding:52px;background:linear-gradient(145deg,#1c1a16,#111);border:1px solid rgba(226,199,126,.42);box-shadow:0 30px 90px rgba(0,0,0,.38)}
+.monthly-plan-card{position:relative;max-width:650px;margin:auto;padding:48px;background:linear-gradient(145deg,#1c1a16,#111);border:1px solid rgba(226,199,126,.42);box-shadow:0 30px 90px rgba(0,0,0,.38)}
 .monthly-plan-card:before{position:absolute;content:"";inset:12px;border:1px solid rgba(226,199,126,.09);pointer-events:none}
 .plan-card-heading{position:relative;display:flex;align-items:center;gap:20px}
 .plan-card-heading h2{margin:7px 0 0;font-family:'Playfair Display',serif;font-size:clamp(35px,5vw,52px);font-weight:600}
 .plan-price{position:relative;margin:45px 0 25px;display:flex;align-items:baseline;gap:8px;color:var(--gold-light)}
 .plan-price small{font-size:18px;font-weight:700}
-.plan-price strong{font-family:inherit;font-size:clamp(72px,10vw,104px);font-weight:600;letter-spacing:normal;line-height:.8}
+.plan-price strong{font-family:inherit;font-size:clamp(72px,10vw,104px);font-weight:700;letter-spacing:normal;line-height:.8}
 .plan-price span{color:var(--muted);font-size:14px}
 .plan-description{position:relative;max-width:520px;color:#b1ada4;line-height:1.75}
 .plan-benefits{position:relative;margin:35px 0;padding:0;list-style:none;border-top:1px solid var(--line)}
