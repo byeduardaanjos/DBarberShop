@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays, Check, Scissors } from "lucide-react";
+import { ArrowRight, CalendarDays, CircleCheck, UserRoundCheck } from "lucide-react";
 import InnerHeader from "../components/InnerHeader";
 
 export const metadata = {
@@ -38,9 +38,9 @@ export default function PlansPage() {
         <p className="plan-description">4 cortes para usar durante 30 dias, com atendimento individual e horário marcado.</p>
 
         <ul className="plan-benefits">
-          <li><Check /><span><strong>4 cortes</strong> incluídos</span></li>
+          <li><CircleCheck /><span><strong>4 cortes</strong> incluídos</span></li>
           <li><CalendarDays /><span>Validade de <strong>30 dias</strong></span></li>
-          <li><Scissors /><span>Um corte por atendimento</span></li>
+          <li><UserRoundCheck /><span>Um corte por atendimento</span></li>
         </ul>
 
         <a className="primary-cta plan-cta" href={whatsappUrl} target="_blank" rel="noopener noreferrer">
