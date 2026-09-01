@@ -200,7 +200,7 @@ textarea{font:inherit}
 .plan-card-heading h2{margin:7px 0 0;font-family:'Playfair Display',serif;font-size:clamp(35px,5vw,52px);font-weight:600}
 .plan-price{position:relative;margin:45px 0 25px;display:flex;align-items:baseline;gap:8px;color:var(--gold-light)}
 .plan-price small{font-size:18px;font-weight:700}
-.plan-price strong{font-family:Arial,Helvetica,sans-serif;font-size:clamp(72px,10vw,104px);font-weight:700;letter-spacing:-.04em;line-height:.8}
+.plan-price strong{font-family:inherit;font-size:clamp(72px,10vw,104px);font-weight:600;letter-spacing:normal;line-height:.8}
 .plan-price span{color:var(--muted);font-size:14px}
 .plan-description{position:relative;max-width:520px;color:#b1ada4;line-height:1.75}
 .plan-benefits{position:relative;margin:35px 0;padding:0;list-style:none;border-top:1px solid var(--line)}
