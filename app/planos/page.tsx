@@ -7,7 +7,7 @@ export const metadata = {
 };
 
 const whatsappMessage = encodeURIComponent(
-  "Olá! Quero assinar o Plano de 4 cortes por R$ 140, válido por 30 dias.",
+  "Olá! Gostaria de assinar o plano mensal de R$ 140 reais da D.BarberShop. Poderia me passar mais informações sobre a assinatura e as formas de pagamento?",
 );
 const whatsappUrl = `https://wa.me/5548991659709?text=${whatsappMessage}`;
 
