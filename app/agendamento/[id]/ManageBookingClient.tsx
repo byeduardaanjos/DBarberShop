@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, CalendarDays, CheckCircle2, Clock3, LoaderCircle, MessageCircle, RotateCcw, Scissors, ShieldCheck, XCircle } from "lucide-react";
 import PremiumCalendar from "../../components/PremiumCalendar";
 
-const times = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
+const times = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
 type Booking = { id:string; customer_name:string; booking_date:string; booking_time:string; status:"confirmed"|"completed"|"cancelled"|"no_show"; service_name:string; selected_services?:string[]; total_price_cents?:number; duration_minutes:number };
 
 function formatDate(value:string){return new Date(`${value}T12:00:00`).toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});}

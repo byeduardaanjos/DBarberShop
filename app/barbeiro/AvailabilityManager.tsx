@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { CalendarOff, Clock3, LoaderCircle, Plus, RefreshCw, Trash2 } from "lucide-react";
 
-const times=["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
+const times=["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
 const today=()=>{const value=new Date();return new Date(value.getTime()-value.getTimezoneOffset()*60000).toISOString().slice(0,10);};
 type Block={id:string;block_date:string;block_time:string|null;reason:string};
 

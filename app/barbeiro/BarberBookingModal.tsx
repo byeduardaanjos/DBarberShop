@@ -11,7 +11,7 @@ const services = [
   { name: "Corte + Sobrancelha", price: 5000 },
   { name: "Corte + Sobrancelha + Barba", price: 7000 },
 ];
-const allTimes = ["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00"];
+const allTimes = ["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"];
 const today = () => { const value=new Date(); return new Date(value.getTime()-value.getTimezoneOffset()*60000).toISOString().slice(0,10); };
 
 type Props = {
