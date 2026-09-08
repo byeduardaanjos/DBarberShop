@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHash, randomUUID } from "node:crypto";
+import { bookingTimes, isBookingTimeAllowed } from "@/lib/booking-hours";
 
 const services = new Set(["Barba", "Corte", "Corte de Tesoura", "Sobrancelha", "Corte + Sobrancelha", "Corte + Sobrancelha + Barba"]);
-const times = new Set(["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"]);
+const times = new Set(bookingTimes);
 
 export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => null)) as null | { services?: string[]; date?: string; time?: string; name?: string; phone?: string; privacyAccepted?: boolean };
   const selectedServices = [...new Set(body?.services ?? [])];
-  if (!body || body.privacyAccepted !== true || selectedServices.length !== 1 || selectedServices.some(service => !services.has(service)) || !times.has(body.time ?? "") || !/^\d{4}-\d{2}-\d{2}$/.test(body.date ?? "") || (body.name?.trim().length ?? 0) < 2 || (body.name?.trim().length ?? 0) > 100 || (body.phone?.trim().length ?? 0) > 30 || (body.phone?.replace(/\D/g, "").length ?? 0) < 10 || !/^[\d\s()+-]+$/.test(body.phone ?? "")) {
+  if (!body || body.privacyAccepted !== true || selectedServices.length !== 1 || selectedServices.some(service => !services.has(service)) || !times.has(body.time ?? "") || !/^\d{4}-\d{2}-\d{2}$/.test(body.date ?? "") || !isBookingTimeAllowed(body.date ?? "", body.time ?? "") || (body.name?.trim().length ?? 0) < 2 || (body.name?.trim().length ?? 0) > 100 || (body.phone?.trim().length ?? 0) > 30 || (body.phone?.replace(/\D/g, "").length ?? 0) < 10 || !/^[\d\s()+-]+$/.test(body.phone ?? "")) {
     return NextResponse.json({ error: "Confira os dados do agendamento." }, { status: 400 });
   }
   const date = body.date!;

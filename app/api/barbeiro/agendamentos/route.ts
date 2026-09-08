@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireBarber } from "@/lib/barber-auth";
+import { bookingTimes, isBookingTimeAllowed } from "@/lib/booking-hours";
 
 const statuses = new Set(["confirmed", "completed", "cancelled", "no_show"]);
 const services = new Set(["Barba", "Corte", "Corte de Tesoura", "Sobrancelha", "Corte + Sobrancelha", "Corte + Sobrancelha + Barba"]);
-const times = new Set(["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"]);
+const times = new Set(bookingTimes);
 
 function supabaseConfig() {
   const url = process.env.SUPABASE_URL;
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
   const body = (await request.json().catch(() => null)) as null | { service?:string; date?:string; time?:string; name?:string; phone?:string };
   const phoneNormalized = body?.phone?.replace(/\D/g, "") ?? "";
-  if (!body || !services.has(body.service ?? "") || !times.has(body.time ?? "") || !/^\d{4}-\d{2}-\d{2}$/.test(body.date ?? "") || (body.name?.trim().length ?? 0)<2 || (body.name?.trim().length ?? 0)>100 || (body.phone?.trim().length ?? 0)>30 || phoneNormalized.length<10 || phoneNormalized.length>15 || !/^[\d\s()+-]+$/.test(body.phone ?? "")) {
+  if (!body || !services.has(body.service ?? "") || !times.has(body.time ?? "") || !/^\d{4}-\d{2}-\d{2}$/.test(body.date ?? "") || !isBookingTimeAllowed(body.date ?? "", body.time ?? "") || (body.name?.trim().length ?? 0)<2 || (body.name?.trim().length ?? 0)>100 || (body.phone?.trim().length ?? 0)>30 || phoneNormalized.length<10 || phoneNormalized.length>15 || !/^[\d\s()+-]+$/.test(body.phone ?? "")) {
     return NextResponse.json({ error: "Confira os dados do agendamento." }, { status: 400 });
   }
   const config = supabaseConfig();

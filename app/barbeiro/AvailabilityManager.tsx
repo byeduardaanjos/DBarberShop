@@ -2,13 +2,14 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { CalendarOff, Clock3, LoaderCircle, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { getBookingTimesForDate } from "@/lib/booking-hours";
 
-const times=["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
 const today=()=>{const value=new Date();return new Date(value.getTime()-value.getTimezoneOffset()*60000).toISOString().slice(0,10);};
 type Block={id:string;block_date:string;block_time:string|null;reason:string};
 
 export default function AvailabilityManager(){
   const [blocks,setBlocks]=useState<Block[]>([]); const [date,setDate]=useState(today); const [time,setTime]=useState("all"); const [reason,setReason]=useState("");
+  const times=getBookingTimesForDate(date);
   const [loading,setLoading]=useState(true); const [saving,setSaving]=useState(false); const [message,setMessage]=useState("");
   const load=useCallback(async()=>{setLoading(true);const response=await fetch("/api/barbeiro/disponibilidade",{cache:"no-store"});const data=await response.json();if(response.ok)setBlocks(data.blocks);else setMessage(data.error??"Não foi possível carregar.");setLoading(false);},[]);
   useEffect(()=>{load();},[load]);

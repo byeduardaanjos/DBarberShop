@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowLeft, ArrowRight, CalendarDays, Check, Clock3, Hash, Instagram, MapPin, Menu, MessageCircle, Settings2, Scissors, ShieldCheck, X } from "lucide-react";
 import PremiumCalendar from "./components/PremiumCalendar";
+import { getBookingTimesForDate } from "@/lib/booking-hours";
 
 const services = [
   { name: "Barba", detail: "Desenho, alinhamento e acabamento da barba.", time: "60 min", price: "R$ 30", priceCents: 3000, image: "/images/imperium-barba-v3.webp" },
@@ -11,7 +12,6 @@ const services = [
   { name: "Corte + Sobrancelha", detail: "Corte com limpeza e alinhamento da sobrancelha.", time: "60 min", price: "R$ 50", priceCents: 5000, image: "/images/imperium-hero-v3.webp" },
   { name: "Corte + Sobrancelha + Barba", detail: "Corte, sobrancelha e barba em um atendimento completo.", time: "60 min", price: "R$ 70", priceCents: 7000, image: "/images/imperium-barba-v3.webp" },
 ];
-const times = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
 
 type ConfirmedBooking = { id: string; manageToken: string; services: string[]; totalPriceCents: number; date: string; time: string; name: string };
 type SavedBooking = { id: string; manageToken: string; savedAt: number };
@@ -35,6 +35,7 @@ export default function Home() {
   const [step, setStep] = useState(1);
   const [selectedServices, setSelectedServices] = useState<string[]>([services[0].name]);
   const [date, setDate] = useState("");
+  const times = getBookingTimesForDate(date);
   const [time, setTime] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");

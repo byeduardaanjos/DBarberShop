@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { CalendarDays, Check, Clock3, LoaderCircle, UserRound, X } from "lucide-react";
+import { getBookingTimesForDate } from "@/lib/booking-hours";
 
 const services = [
   { name: "Barba", price: 3000 },
@@ -11,7 +12,6 @@ const services = [
   { name: "Corte + Sobrancelha", price: 5000 },
   { name: "Corte + Sobrancelha + Barba", price: 7000 },
 ];
-const allTimes = ["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"];
 const today = () => { const value=new Date(); return new Date(value.getTime()-value.getTimezoneOffset()*60000).toISOString().slice(0,10); };
 
 type Props = {
@@ -24,6 +24,7 @@ type Props = {
 export default function BarberBookingModal({open,initialDate,onClose,onCreated}:Props){
   const [service,setService]=useState(services[0].name);
   const [date,setDate]=useState(initialDate);
+  const allTimes=getBookingTimesForDate(date);
   const [time,setTime]=useState("");
   const [name,setName]=useState("");
   const [phone,setPhone]=useState("");
