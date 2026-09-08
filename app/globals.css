@@ -38,7 +38,10 @@
 
 /* D.BarberShop black and muted gold palette */
 :root{--black:#050505;--matte:#0d0d0d;--graphite:#151515;--soft:#202020;--silver:#b4955a;--gold:#b4955a;--gold-light:#d0b478;--white:#eeeae2;--muted:#918d86;--line:rgba(180,149,90,.22)}
-.site-header{border-bottom-color:rgba(180,149,90,.25)}
+.site-header{
+  position:fixed;
+  border-bottom-color:rgba(180,149,90,.25);
+}
 .header-cta{color:var(--gold-light);background:rgba(5,5,5,.45);border-color:var(--gold)}
 .eyebrow,.modal-kicker{color:var(--gold-light)}
 .hero h1 span{color:#d8c7a7}
