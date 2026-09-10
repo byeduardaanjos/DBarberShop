@@ -1,118 +1,244 @@
 "use client";
-import { useEffect, useState } from "react";
-import { ArrowDown, ArrowLeft, ArrowRight, CalendarDays, Check, Clock3, Hash, Instagram, MapPin, Menu, MessageCircle, Settings2, Scissors, ShieldCheck, X } from "lucide-react";
-import PremiumCalendar from "./components/PremiumCalendar";
-import { getBookingTimesForDate } from "@/lib/booking-hours";
+
+import { useState } from "react";
+import {
+  ArrowDown,
+  ArrowRight,
+  CalendarDays,
+  Clock3,
+  Instagram,
+  MapPin,
+  Menu,
+  MessageCircle,
+  Scissors,
+  Sparkles,
+  Star,
+  X,
+} from "lucide-react";
 
 const services = [
-  { name: "Barba", detail: "Desenho, alinhamento e acabamento da barba.", time: "60 min", price: "R$ 30", priceCents: 3000, image: "/images/imperium-barba-v3.webp" },
-  { name: "Corte", detail: "Corte masculino com acabamento preciso e personalizado.", time: "60 min", price: "R$ 40", priceCents: 4000, image: "/images/imperium-ambiente-v3.webp" },
-  { name: "Corte de Tesoura", detail: "Corte clássico feito inteiramente na tesoura.", time: "60 min", price: "R$ 45", priceCents: 4500, image: "/images/imperium-hero-v3.webp" },
-  { name: "Sobrancelha", detail: "Limpeza e alinhamento para um visual cuidado.", time: "60 min", price: "R$ 10", priceCents: 1000, image: "/images/imperium-hero-v3.webp" },
-  { name: "Corte + Sobrancelha", detail: "Corte com limpeza e alinhamento da sobrancelha.", time: "60 min", price: "R$ 50", priceCents: 5000, image: "/images/imperium-hero-v3.webp" },
-  { name: "Corte + Sobrancelha + Barba", detail: "Corte, sobrancelha e barba em um atendimento completo.", time: "60 min", price: "R$ 70", priceCents: 7000, image: "/images/imperium-barba-v3.webp" },
+  { name: "Corte tradicional", price: "R$ 40", detail: "Tesoura e máquina com acabamento preciso." },
+  { name: "Degradê", price: "R$ 45", detail: "Transição limpa e finalização personalizada." },
+  { name: "Barba", price: "R$ 30", detail: "Desenho, alinhamento e acabamento da barba." },
+  { name: "Corte + barba", price: "R$ 65", detail: "Experiência completa para renovar o visual." },
+  { name: "Corte infantil", price: "R$ 35", detail: "Atendimento cuidadoso e confortável." },
+  { name: "Sobrancelha", price: "R$ 10", detail: "Limpeza e alinhamento para finalizar o visual." },
 ];
 
-type ConfirmedBooking = { id: string; manageToken: string; services: string[]; totalPriceCents: number; date: string; time: string; name: string };
-type SavedBooking = { id: string; manageToken: string; savedAt: number };
-
-const savedBookingKey = "dbarbershop:last-booking";
-const savedBookingLifetime = 90 * 24 * 60 * 60 * 1000;
-
-function formatBookingDate(value: string) {
-  return new Date(`${value}T12:00:00`).toLocaleDateString("pt-BR", {
-    weekday: "long", day: "2-digit", month: "long", year: "numeric",
-  });
-}
-
-function bookingCode(id: string) {
-  return `DB-${id.replace(/-/g, "").slice(0, 6).toUpperCase()}`;
-}
+const gallery = [
+  {
+    src: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1100&q=86",
+    alt: "Corte masculino em barbearia",
+    label: "Precisão",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1100&q=86",
+    alt: "Ambiente de barbearia",
+    label: "Experiência",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&w=1100&q=86",
+    alt: "Barbeiro realizando acabamento",
+    label: "Detalhe",
+  },
+];
 
 export default function Home() {
-  const [bookingOpen, setBookingOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [step, setStep] = useState(1);
-  const [selectedServices, setSelectedServices] = useState<string[]>([services[0].name]);
-  const [date, setDate] = useState("");
-  const times = getBookingTimesForDate(date);
-  const [time, setTime] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [privacyAccepted, setPrivacyAccepted] = useState(false);
-  const [availableTimes, setAvailableTimes] = useState(times);
-  const [loadingTimes, setLoadingTimes] = useState(false);
-  const [bookingError, setBookingError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [confirmedBooking, setConfirmedBooking] = useState<ConfirmedBooking | null>(null);
-  const [savedBookingUrl, setSavedBookingUrl] = useState("");
-  const totalPriceCents = selectedServices.reduce((total, name) => total + (services.find(item => item.name === name)?.priceCents ?? 0), 0);
-  function openBooking(selected?: string) { if (selected) setSelectedServices([selected]); setBookingOpen(true); setMenuOpen(false); setConfirmedBooking(null); setPrivacyAccepted(false); setBookingError(""); setStep(1); }
-  async function loadAvailability(selectedDate: string, selectedService = selectedServices[0]) {
-    setDate(selectedDate); setTime(""); setBookingError(""); setLoadingTimes(true);
-    try {
-      const response = await fetch(`/api/availability?date=${selectedDate}&service=${encodeURIComponent(selectedService)}`, { cache: "no-store" });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error);
-      setAvailableTimes(result.available);
-    } catch { setAvailableTimes([]); setBookingError("Não foi possível consultar os horários. Tente novamente."); }
-    finally { setLoadingTimes(false); }
+  const [bookingOpen, setBookingOpen] = useState(false);
+
+  function closeMenu() {
+    setMenuOpen(false);
   }
-  async function submitBooking(e: React.FormEvent) {
-    e.preventDefault(); setBookingError(""); setSubmitting(true);
-    try {
-      const response = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ services: selectedServices, date, time, name, phone, privacyAccepted }) });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error);
-      const confirmed = { id: result.bookingId, manageToken: result.manageToken, services: selectedServices, totalPriceCents, date, time, name: name.trim() };
-      const saved: SavedBooking = { id: result.bookingId, manageToken: result.manageToken, savedAt: Date.now() };
-      const managePath = `/agendamento/${saved.id}#token=${encodeURIComponent(saved.manageToken)}`;
-      localStorage.setItem(savedBookingKey, JSON.stringify(saved));
-      setSavedBookingUrl(managePath);
-      setConfirmedBooking(confirmed);
-      setStep(3);
-    } catch (error) { setBookingError(error instanceof Error ? error.message : "Não foi possível concluir o agendamento."); }
-    finally { setSubmitting(false); }
-  }
-  const manageUrl = confirmedBooking && typeof window !== "undefined" ? `${window.location.origin}/agendamento/${confirmedBooking.id}#token=${encodeURIComponent(confirmedBooking.manageToken)}` : "";
-  const whatsappConfirmation = confirmedBooking
-    ? `https://wa.me/5548991659709?text=${encodeURIComponent(`Agendamento confirmado na D.BarberShop\n\n${confirmedBooking.services.join(" + ")}\nTotal: ${(confirmedBooking.totalPriceCents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}\n${formatBookingDate(confirmedBooking.date)} às ${confirmedBooking.time}\nCódigo: ${bookingCode(confirmedBooking.id)}\nCliente: ${confirmedBooking.name}\n\nGerenciar: ${manageUrl}`)}`
-    : "#";
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(savedBookingKey) ?? "null") as SavedBooking | null;
-      const valid = saved && /^[0-9a-f-]{36}$/i.test(saved.id) && saved.manageToken.length === 72 && Date.now() - saved.savedAt < savedBookingLifetime;
-      if (valid) setSavedBookingUrl(`/agendamento/${saved.id}#token=${encodeURIComponent(saved.manageToken)}`);
-      else localStorage.removeItem(savedBookingKey);
-    } catch { localStorage.removeItem(savedBookingKey); }
-    const params = new URLSearchParams(window.location.search); const selected = params.get("servico"); if (selected && services.some(item => item.name === selected)) openBooking(selected); else if (params.get("agendar") === "1") openBooking();
-  }, []);
 
-  return <main>
-    <header className="site-header">
-      <a href="/" className="brand brand-logo" aria-label="Página inicial da D.BarberShop"><img src="/images/dbarbershop-wordmark-transparent.png" alt="D.BarberShop"/></a>
-      <button className={menuOpen ? "menu-toggle open" : "menu-toggle"} onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen}>{menuOpen ? <X/> : <Menu/>}</button>
-      <nav className={menuOpen ? "nav open" : "nav"}><a href="/servicos">Serviços</a><a href="/planos">Planos</a><a href="/trabalhos">Trabalhos</a><a href="#sobre">Sobre</a><a href="#contato">Contato</a>{savedBookingUrl&&<a className="nav-manage" href={savedBookingUrl}>Meu agendamento</a>}<a className="nav-book" href="/?agendar=1">Agendar horário</a></nav>
-      <button className="header-cta" onClick={() => openBooking()}>Agendar horário</button>
-    </header>
+  return (
+    <main className="dvini-site">
+      <header className="dv-header">
+        <a className="dv-brand" href="#inicio" onClick={closeMenu} aria-label="Barbearia do Vini">
+          <span className="dv-brand-small">BARBEARIA</span>
+          <strong>dº Vini</strong>
+        </a>
 
-    <section className="hero" id="inicio">
-      <div className="hero-overlay"/>
-      <div className="hero-content"><p className="eyebrow">BARBEARIA PREMIUM · BIGUAÇU — SC</p><h1>Precisão em cada detalhe.<br/><span>Presença em cada corte.</span></h1><p>Atendimento individual, técnica e acabamento impecável para quem valoriza a própria imagem.</p><button className="primary-cta" onClick={() => openBooking()}><span>Agendar horário</span><CalendarDays/></button></div>
-      <a href="#servicos" className="scroll-link">CONHEÇA A D.BARBERSHOP <ArrowDown/></a>
-    </section>
+        <nav className={menuOpen ? "dv-nav open" : "dv-nav"}>
+          <a href="#servicos" onClick={closeMenu}>Serviços</a>
+          <a href="#trabalhos" onClick={closeMenu}>Trabalhos</a>
+          <a href="#sobre" onClick={closeMenu}>A barbearia</a>
+          <a href="#localizacao" onClick={closeMenu}>Localização</a>
+        </nav>
 
-    <section className="pillars"><article><b>01</b><h3>Atendimento individual</h3><p>Uma experiência pensada no seu estilo e no seu tempo.</p></article><article><b>02</b><h3>Técnica e precisão</h3><p>Acabamento cuidadoso, do primeiro ao último detalhe.</p></article><article><b>03</b><h3>Ambiente premium</h3><p>Conforto, discrição e uma atmosfera feita para você.</p></article></section>
+        <button className="dv-book-header" onClick={() => setBookingOpen(true)}>
+          Agendar horário <ArrowRight size={16} />
+        </button>
 
-    <section className="services" id="servicos"><div className="section-title"><p className="eyebrow">SERVIÇOS EM DESTAQUE</p><h2>Escolha sua experiência.</h2><p>Uma seleção dos atendimentos mais procurados da D.BarberShop.</p></div><div className="service-grid featured-services">{services.slice(0,2).map((item,index)=><article className="service-card service-card-no-image" key={item.name}><span className="service-index">0{index+1}</span><div className="service-body"><div><h3>{item.name}</h3><p>{item.detail}</p></div><div className="service-meta"><span><Clock3/>{item.time}</span><strong>{item.price}</strong></div><button onClick={() => openBooking(item.name)}><span>Selecionar serviço</span><ArrowRight/></button></div></article>)}</div><div className="all-services-link"><a className="outline-cta icon-link" href="/servicos"><span>Ver todos os serviços</span><ArrowRight/></a></div></section>
+        <button
+          className="dv-menu"
+          aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? <X /> : <Menu />}
+        </button>
+      </header>
 
-    <section className="work" id="trabalhos"><div className="gallery-coming-soon"><p className="eyebrow">TRABALHOS D.BARBERSHOP</p><h2>Novos trabalhos<br/>em breve.</h2><p>A galeria receberá os primeiros cortes, barbas e acabamentos realizados na D.BarberShop.</p><a className="outline-cta icon-link" href="/trabalhos"><span>Conhecer a galeria</span><ArrowRight/></a></div></section>
+      <section className="dv-hero" id="inicio">
+        <div className="dv-hero-photo" />
+        <div className="dv-hero-shade" />
+        <div className="dv-hero-grain" />
 
-    <section className="about about-editorial" id="sobre"><div className="about-copy"><p className="eyebrow">SOBRE A D.BARBERSHOP</p><h2>Atendimento individual.<br/>Resultado com identidade.</h2><p>A D.BarberShop é uma barbearia de atendimento individual em Biguaçu. Cada serviço começa com uma conversa sobre estilo, rotina e preferência para que o resultado tenha precisão e combine com cada cliente.</p><ul><li>Atendimento com hora marcada</li><li>Consultoria antes do corte</li><li>Finalização e orientação de cuidados</li></ul><button className="outline-cta" onClick={() => openBooking()}>Agendar atendimento</button></div></section>
+        <div className="dv-hero-content">
+          <p className="dv-kicker"><span /> PALHOÇA · SANTA CATARINA</p>
+          <h1>
+            Do tradicional
+            <em>ao moderno.</em>
+          </h1>
+          <p className="dv-hero-copy">
+            Técnica, estilo e cuidado em uma experiência feita para quem entende que presença começa nos detalhes.
+          </p>
+          <div className="dv-hero-actions">
+            <button className="dv-primary" onClick={() => setBookingOpen(true)}>
+              <span>Agendar horário</span><CalendarDays size={18} />
+            </button>
+            <a className="dv-ghost" href="#trabalhos">Ver trabalhos <ArrowRight size={17} /></a>
+          </div>
+        </div>
 
-    <section className="contact" id="contato"><div className="contact-heading"><p className="eyebrow">CONTATO</p><h2>Fale com a D.BarberShop.</h2></div><div className="contact-actions"><a className="contact-action" href="https://wa.me/qr/MR5FUVF24SOGK1" target="_blank" rel="noopener noreferrer"><MessageCircle className="contact-action-icon"/><span><small>ATENDIMENTO</small><strong>WhatsApp</strong><em>Dúvidas e informações</em></span><ArrowRight className="contact-action-arrow"/></a><a className="contact-action" href="https://www.instagram.com/d.barbershop00/" target="_blank" rel="noopener noreferrer" aria-label="Abrir o Instagram da D.BarberShop"><Instagram className="contact-action-icon"/><span><small>NOVIDADES</small><strong>Instagram</strong><em>Cortes e trabalhos</em></span><ArrowRight className="contact-action-arrow"/></a></div><div className="contact-details"><a className="contact-action contact-detail" href="https://maps.app.goo.gl/md8iSMqjxu3RRUD27?g_st=ic" target="_blank" rel="noopener noreferrer"><MapPin className="contact-action-icon"/><span><small>VISITE-NOS</small><strong>Localização</strong><em>Rua Francisco Roberto da Silva, 676<br/>Centro, Biguaçu — SC</em></span><ArrowRight className="contact-action-arrow"/></a><button className="contact-action contact-detail" onClick={() => openBooking()}><Clock3 className="contact-action-icon"/><span><small>ATENDIMENTO</small><strong>Horários</strong><em>Seg–sáb 08h–20h<br/>Domingo fechado</em></span><CalendarDays className="contact-action-arrow"/></button></div></section>
-    <footer><span className="brand brand-logo footer-brand"><img src="/images/dbarbershop-wordmark.webp" alt="D.BarberShop"/></span><span>Biguaçu — Santa Catarina</span><span>© 2026</span></footer>
+        <div className="dv-hero-side">
+          <span>SEG — SEX</span><strong>09h — 19h</strong>
+          <span>SÁBADO</span><strong>08h — 15h</strong>
+        </div>
 
-    {bookingOpen && <div className="modal-backdrop" onMouseDown={e=>e.target===e.currentTarget&&setBookingOpen(false)}><section className="booking-modal" role="dialog" aria-modal="true"><button className="modal-close" aria-label="Fechar agendamento" onClick={()=>setBookingOpen(false)}><X/></button>{step<3&&<p className="modal-kicker">AGENDAMENTO · ETAPA {step} DE 2</p>}{step===1&&<><h2>Escolha seu horário.</h2><label>Serviço<select value={selectedServices[0]} onChange={e=>{setSelectedServices([e.target.value]);if(date)loadAvailability(date,e.target.value);}}>{services.map(item=><option key={item.name} value={item.name}>{item.name} · {item.price}</option>)}</select></label><fieldset className="calendar-fieldset"><legend>Data</legend><PremiumCalendar value={date} onChange={loadAvailability}/></fieldset><fieldset><legend>Horários disponíveis</legend>{loadingTimes&&<p className="booking-feedback">Consultando horários…</p>}<div className="time-grid">{times.map(t=><button key={t} type="button" disabled={!date||loadingTimes||!availableTimes.includes(t)} className={time===t?"selected":""} onClick={()=>setTime(t)}>{t}</button>)}</div></fieldset>{bookingError&&<p className="booking-error" role="alert">{bookingError}</p>}<button className="primary-cta modal-next" disabled={!date||!time||loadingTimes} onClick={()=>setStep(2)}><span>Continuar</span><ArrowRight/></button></>}{step===2&&<form onSubmit={submitBooking}><h2>Quase tudo pronto.</h2><p className="booking-summary">{selectedServices.join(" + ")}<br/><strong>Total: {(totalPriceCents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</strong><br/>{date.split("-").reverse().join("/")} às {time}</p><label>Seu nome<input value={name} onChange={e=>setName(e.target.value)} placeholder="Nome completo" required/></label><label>WhatsApp<input value={phone} onChange={e=>setPhone(e.target.value)} placeholder="(48) 99999-9999" inputMode="tel" required/></label><label className="privacy-consent"><input type="checkbox" checked={privacyAccepted} onChange={e=>setPrivacyAccepted(e.target.checked)} required/><ShieldCheck/><span>Autorizo o uso destes dados apenas para realizar e administrar meu agendamento.</span></label>{bookingError&&<p className="booking-error" role="alert">{bookingError}</p>}<button className="primary-cta modal-next" disabled={submitting||!privacyAccepted}><span>{submitting?"Confirmando…":"Confirmar agendamento"}</span><Check/></button><button className="back-button icon-link" type="button" onClick={()=>setStep(1)}><ArrowLeft/><span>Voltar</span></button></form>}{step===3&&confirmedBooking&&<div className="success receipt-success"><span className="success-mark"><Check/></span><p className="modal-kicker">AGENDAMENTO CONFIRMADO</p><h2>Horário reservado.</h2><p className="receipt-intro">Pronto, {confirmedBooking.name.split(" ")[0]}. Seu atendimento já está na agenda da D.BarberShop.</p><div className="booking-receipt"><div><span><Scissors/>Serviço</span><strong>{confirmedBooking.services.join(" + ")} · {(confirmedBooking.totalPriceCents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</strong></div><div><span><CalendarDays/>Data</span><strong>{formatBookingDate(confirmedBooking.date)}</strong></div><div><span><Clock3/>Horário</span><strong>{confirmedBooking.time}</strong></div><div><span><Hash/>Código</span><strong>{bookingCode(confirmedBooking.id)}</strong></div></div><div className="receipt-actions"><a className="receipt-action receipt-whatsapp" href={whatsappConfirmation} target="_blank" rel="noopener noreferrer"><MessageCircle/><span>Enviar confirmação no WhatsApp</span></a><a className="receipt-action receipt-manage" href={`/agendamento/${confirmedBooking.id}#token=${encodeURIComponent(confirmedBooking.manageToken)}`}><Settings2/><span>Cancelar ou reagendar</span></a></div><button className="back-button receipt-close" onClick={()=>setBookingOpen(false)}>Voltar ao site</button></div>}</section></div>}
-  </main>;
+        <a className="dv-scroll" href="#servicos">DESCUBRA A EXPERIÊNCIA <ArrowDown size={15} /></a>
+      </section>
+
+      <section className="dv-manifesto">
+        <p className="dv-kicker"><span /> NOSSA ESSÊNCIA</p>
+        <div className="dv-manifesto-grid">
+          <h2>Não é apenas um corte.<br/>É a sua <em>assinatura.</em></h2>
+          <p>
+            Um espaço onde técnica e identidade se encontram. Cada atendimento é pensado para respeitar seu estilo, sua rotina e a imagem que você quer transmitir.
+          </p>
+        </div>
+        <div className="dv-values">
+          <article><b>01</b><Scissors /><h3>Técnica</h3><p>Execução precisa do primeiro ao último detalhe.</p></article>
+          <article><b>02</b><Sparkles /><h3>Identidade</h3><p>Um resultado que combina com você, não com tendências passageiras.</p></article>
+          <article><b>03</b><Clock3 /><h3>Experiência</h3><p>Atendimento com tempo, cuidado e ambiente pensado para desacelerar.</p></article>
+        </div>
+      </section>
+
+      <section className="dv-services" id="servicos">
+        <div className="dv-section-head">
+          <div><p className="dv-kicker"><span /> SERVIÇOS</p><h2>Escolha seu <em>ritual.</em></h2></div>
+          <p>Valores demonstrativos para apresentação do projeto.</p>
+        </div>
+        <div className="dv-service-list">
+          {services.map((service, index) => (
+            <button className="dv-service-row" key={service.name} onClick={() => setBookingOpen(true)}>
+              <span className="dv-service-number">0{index + 1}</span>
+              <span className="dv-service-name"><strong>{service.name}</strong><small>{service.detail}</small></span>
+              <span className="dv-service-price">{service.price}</span>
+              <span className="dv-service-arrow"><ArrowRight /></span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="dv-work" id="trabalhos">
+        <div className="dv-section-head dv-section-head-light">
+          <div><p className="dv-kicker"><span /> TRABALHOS</p><h2>Estilo que fala<br/><em>antes de você.</em></h2></div>
+          <a href="https://www.instagram.com/barbeariad.vini" target="_blank" rel="noreferrer">Ver Instagram <ArrowRight size={16} /></a>
+        </div>
+        <div className="dv-gallery">
+          {gallery.map((item, index) => (
+            <figure className={`dv-gallery-card card-${index + 1}`} key={item.src}>
+              <img src={item.src} alt={item.alt} />
+              <figcaption><span>0{index + 1}</span>{item.label}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <section className="dv-about" id="sobre">
+        <div className="dv-about-image">
+          <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=1400&q=88" alt="Interior de uma barbearia premium" />
+          <span className="dv-image-tag">TRADIÇÃO · TÉCNICA · PRESENÇA</span>
+        </div>
+        <div className="dv-about-copy">
+          <p className="dv-kicker"><span /> BARBEARIA DO VINI</p>
+          <h2>Clássico na essência.<br/><em>Atual na atitude.</em></h2>
+          <p>
+            A Barbearia do Vini nasce do encontro entre o respeito pela barbearia tradicional e a linguagem do homem contemporâneo. Um atendimento próximo, técnico e sem pressa.
+          </p>
+          <div className="dv-about-stats">
+            <div><strong>01</strong><span>atendimento pensado no seu estilo</span></div>
+            <div><strong>100%</strong><span>foco em acabamento e experiência</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="dv-proof">
+        <p className="dv-kicker"><span /> EXPERIÊNCIA</p>
+        <blockquote>“Um corte bem feito muda o visual. Uma experiência bem feita muda a forma como você se apresenta.”</blockquote>
+        <div className="dv-stars" aria-label="Cinco estrelas"><Star/><Star/><Star/><Star/><Star/></div>
+        <small>Espaço reservado para avaliações reais do Google.</small>
+      </section>
+
+      <section className="dv-location" id="localizacao">
+        <div className="dv-location-main">
+          <p className="dv-kicker"><span /> VENHA CONHECER</p>
+          <h2>Seu próximo corte<br/>começa <em>aqui.</em></h2>
+          <a className="dv-map-link" href="https://maps.app.goo.gl/rpTWc2T2RkhYW5aT9?g_st=ic" target="_blank" rel="noreferrer">
+            <MapPin />
+            <span><small>LOCALIZAÇÃO</small><strong>São Sebastião · Palhoça — SC</strong><em>Abrir no Google Maps</em></span>
+            <ArrowRight />
+          </a>
+        </div>
+        <div className="dv-hours">
+          <p>HORÁRIOS</p>
+          <div><span>Segunda — Sexta</span><strong>09h — 19h</strong></div>
+          <div><span>Sábado</span><strong>08h — 15h</strong></div>
+          <div><span>Domingo</span><strong>Fechado</strong></div>
+          <button className="dv-primary" onClick={() => setBookingOpen(true)}><span>Agendar horário</span><ArrowRight size={18}/></button>
+        </div>
+      </section>
+
+      <section className="dv-final-cta">
+        <span className="dv-final-watermark">dº Vini</span>
+        <div>
+          <p className="dv-kicker"><span /> PRONTO PARA MUDAR O VISUAL?</p>
+          <h2>Seu horário.<br/><em>Seu estilo.</em></h2>
+          <button className="dv-primary dv-primary-light" onClick={() => setBookingOpen(true)}><span>Quero agendar</span><ArrowRight size={18}/></button>
+        </div>
+      </section>
+
+      <footer className="dv-footer">
+        <div className="dv-brand dv-brand-footer"><span className="dv-brand-small">BARBEARIA</span><strong>dº Vini</strong></div>
+        <p>Do tradicional ao moderno.</p>
+        <a href="https://www.instagram.com/barbeariad.vini" target="_blank" rel="noreferrer"><Instagram size={17}/> @barbeariad.vini</a>
+        <span>© 2026</span>
+      </footer>
+
+      {bookingOpen && (
+        <div className="dv-modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setBookingOpen(false)}>
+          <section className="dv-booking-modal" role="dialog" aria-modal="true" aria-label="Demonstração de agendamento">
+            <button className="dv-modal-close" onClick={() => setBookingOpen(false)} aria-label="Fechar"><X /></button>
+            <p className="dv-kicker"><span /> EXPERIÊNCIA DE AGENDAMENTO</p>
+            <h2>Como prefere<br/><em>reservar seu horário?</em></h2>
+            <p className="dv-modal-intro">Na versão final, o cliente pode escolher entre atendimento rápido pelo WhatsApp ou agenda integrada ao próprio site.</p>
+            <div className="dv-booking-options">
+              <button>
+                <MessageCircle />
+                <span><small>OPÇÃO 01</small><strong>WhatsApp</strong><em>Conversa direta e rápida</em></span>
+                <ArrowRight />
+              </button>
+              <button>
+                <CalendarDays />
+                <span><small>OPÇÃO 02</small><strong>Agenda online</strong><em>Serviço, data e horário no site</em></span>
+                <ArrowRight />
+              </button>
+            </div>
+            <p className="dv-demo-note">Demonstração visual · a integração é definida após a aprovação do projeto.</p>
+          </section>
+        </div>
+      )}
+    </main>
+  );
 }
