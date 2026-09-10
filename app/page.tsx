@@ -12,7 +12,6 @@ import {
   MessageCircle,
   Scissors,
   Sparkles,
-  Star,
   X,
 } from "lucide-react";
 
@@ -62,7 +61,6 @@ export default function Home() {
         <nav className={menuOpen ? "dv-nav open" : "dv-nav"}>
           <a href="#servicos" onClick={closeMenu}>Serviços</a>
           <a href="#trabalhos" onClick={closeMenu}>Trabalhos</a>
-          <a href="#sobre" onClick={closeMenu}>A barbearia</a>
           <a href="#localizacao" onClick={closeMenu}>Localização</a>
         </nav>
 
@@ -91,7 +89,7 @@ export default function Home() {
             <em>ao moderno.</em>
           </h1>
           <p className="dv-hero-copy">
-            Técnica, estilo e cuidado em uma experiência feita para quem entende que presença começa nos detalhes.
+            Estilo, técnica e cuidado em uma experiência pensada para valorizar cada detalhe.
           </p>
           <div className="dv-hero-actions">
             <button className="dv-primary" onClick={() => setBookingOpen(true)}>
@@ -110,17 +108,17 @@ export default function Home() {
       </section>
 
       <section className="dv-manifesto">
-        <p className="dv-kicker"><span /> NOSSA ESSÊNCIA</p>
+        <p className="dv-kicker"><span /> IDENTIDADE</p>
         <div className="dv-manifesto-grid">
-          <h2>Não é apenas um corte.<br/>É a sua <em>assinatura.</em></h2>
+          <h2>Visual marcante.<br/>Acabamento <em>preciso.</em></h2>
           <p>
-            Um espaço onde técnica e identidade se encontram. Cada atendimento é pensado para respeitar seu estilo, sua rotina e a imagem que você quer transmitir.
+            Uma apresentação premium da Barbearia do Vini, com foco em serviços, trabalhos, localização e agendamento.
           </p>
         </div>
         <div className="dv-values">
-          <article><b>01</b><Scissors /><h3>Técnica</h3><p>Execução precisa do primeiro ao último detalhe.</p></article>
-          <article><b>02</b><Sparkles /><h3>Identidade</h3><p>Um resultado que combina com você, não com tendências passageiras.</p></article>
-          <article><b>03</b><Clock3 /><h3>Experiência</h3><p>Atendimento com tempo, cuidado e ambiente pensado para desacelerar.</p></article>
+          <article><b>01</b><Scissors /><h3>Técnica</h3><p>Cortes e acabamentos apresentados com destaque visual.</p></article>
+          <article><b>02</b><Sparkles /><h3>Estilo</h3><p>Uma identidade que combina tradição com uma linguagem atual.</p></article>
+          <article><b>03</b><Clock3 /><h3>Praticidade</h3><p>Acesso rápido a horários, localização e formas de agendamento.</p></article>
         </div>
       </section>
 
@@ -156,38 +154,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="dv-about" id="sobre">
-        <div className="dv-about-image">
-          <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=1400&q=88" alt="Interior de uma barbearia premium" />
-          <span className="dv-image-tag">TRADIÇÃO · TÉCNICA · PRESENÇA</span>
-        </div>
-        <div className="dv-about-copy">
-          <p className="dv-kicker"><span /> BARBEARIA DO VINI</p>
-          <h2>Clássico na essência.<br/><em>Atual na atitude.</em></h2>
-          <p>
-            A Barbearia do Vini nasce do encontro entre o respeito pela barbearia tradicional e a linguagem do homem contemporâneo. Um atendimento próximo, técnico e sem pressa.
-          </p>
-          <div className="dv-about-stats">
-            <div><strong>01</strong><span>atendimento pensado no seu estilo</span></div>
-            <div><strong>100%</strong><span>foco em acabamento e experiência</span></div>
-          </div>
-        </div>
-      </section>
-
-      <section className="dv-proof">
-        <p className="dv-kicker"><span /> EXPERIÊNCIA</p>
-        <blockquote>“Um corte bem feito muda o visual. Uma experiência bem feita muda a forma como você se apresenta.”</blockquote>
-        <div className="dv-stars" aria-label="Cinco estrelas"><Star/><Star/><Star/><Star/><Star/></div>
-        <small>Espaço reservado para avaliações reais do Google.</small>
-      </section>
-
       <section className="dv-location" id="localizacao">
         <div className="dv-location-main">
-          <p className="dv-kicker"><span /> VENHA CONHECER</p>
+          <p className="dv-kicker"><span /> LOCALIZAÇÃO</p>
           <h2>Seu próximo corte<br/>começa <em>aqui.</em></h2>
           <a className="dv-map-link" href="https://maps.app.goo.gl/rpTWc2T2RkhYW5aT9?g_st=ic" target="_blank" rel="noreferrer">
             <MapPin />
-            <span><small>LOCALIZAÇÃO</small><strong>São Sebastião · Palhoça — SC</strong><em>Abrir no Google Maps</em></span>
+            <span><small>GOOGLE MAPS</small><strong>São Sebastião · Palhoça — SC</strong><em>Abrir localização</em></span>
             <ArrowRight />
           </a>
         </div>
@@ -203,7 +176,7 @@ export default function Home() {
       <section className="dv-final-cta">
         <span className="dv-final-watermark">dº Vini</span>
         <div>
-          <p className="dv-kicker"><span /> PRONTO PARA MUDAR O VISUAL?</p>
+          <p className="dv-kicker"><span /> AGENDE SEU HORÁRIO</p>
           <h2>Seu horário.<br/><em>Seu estilo.</em></h2>
           <button className="dv-primary dv-primary-light" onClick={() => setBookingOpen(true)}><span>Quero agendar</span><ArrowRight size={18}/></button>
         </div>
@@ -220,9 +193,9 @@ export default function Home() {
         <div className="dv-modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && setBookingOpen(false)}>
           <section className="dv-booking-modal" role="dialog" aria-modal="true" aria-label="Demonstração de agendamento">
             <button className="dv-modal-close" onClick={() => setBookingOpen(false)} aria-label="Fechar"><X /></button>
-            <p className="dv-kicker"><span /> EXPERIÊNCIA DE AGENDAMENTO</p>
+            <p className="dv-kicker"><span /> AGENDAMENTO</p>
             <h2>Como prefere<br/><em>reservar seu horário?</em></h2>
-            <p className="dv-modal-intro">Na versão final, o cliente pode escolher entre atendimento rápido pelo WhatsApp ou agenda integrada ao próprio site.</p>
+            <p className="dv-modal-intro">O projeto pode funcionar com atendimento direto pelo WhatsApp ou com uma agenda completa dentro do próprio site.</p>
             <div className="dv-booking-options">
               <button>
                 <MessageCircle />
