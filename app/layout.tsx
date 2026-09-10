@@ -1,46 +1,66 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow_Condensed, Manrope } from "next/font/google";
 import "./globals.css";
-import MotionEnhancements from "./components/MotionEnhancements";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const viniDisplay = Barlow_Condensed({
+  variable: "--font-vini-display",
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const viniSans = Manrope({
+  variable: "--font-vini-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://imperium-barber.eluanebarrosanjos.chatgpt.site"),
-  title: { default: "D.BarberShop | Barbearia Premium em Biguaçu", template: "%s | D.BarberShop" },
-  description: "Atendimento individual, precisão técnica e uma experiência premium em Biguaçu, Santa Catarina.",
-  keywords: ["barbearia em Biguaçu", "barbeiro em Biguaçu", "corte masculino", "barba", "D.BarberShop"],
-  openGraph: { title: "D.BarberShop | Barbearia Premium em Biguaçu", description: "Atendimento individual, precisão técnica e uma experiência premium.", locale: "pt_BR", type: "website", images: ["/images/imperium-hero-v3.webp"] },
+  title: {
+    default: "Barbearia do Vini | Palhoça",
+    template: "%s | Barbearia do Vini",
+  },
+  description: "Barbearia do Vini em São Sebastião, Palhoça. Conheça a barbearia, veja trabalhos, avaliações, localização e opções de agendamento.",
+  keywords: [
+    "Barbearia do Vini",
+    "barbearia em Palhoça",
+    "barbeiro em Palhoça",
+    "barbearia São Sebastião",
+  ],
+  openGraph: {
+    title: "Barbearia do Vini | Palhoça",
+    description: "Estilo, presença e praticidade em São Sebastião, Palhoça.",
+    locale: "pt_BR",
+    type: "website",
+  },
   other: {
     "codex-preview": "development",
   },
-  icons: {
-    icon: "/images/dbarbershop-monogram.webp",
-    shortcut: "/images/dbarbershop-monogram.webp",
-    apple: "/images/dbarbershop-monogram.webp",
-  },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({"@context":"https://schema.org","@type":"BarberShop",name:"D.BarberShop",description:"Barbearia de atendimento individual em Biguaçu.",address:{"@type":"PostalAddress",streetAddress:"Rua Francisco Roberto da Silva, 676",addressLocality:"Biguaçu",addressRegion:"SC",postalCode:"88160-000",addressCountry:"BR"},priceRange:"$$"})}} />
-        <MotionEnhancements />
+      <body className={`${viniDisplay.variable} ${viniSans.variable}`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BarberShop",
+              name: "Barbearia do Vini",
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: "R. Tomaz Domingos da Silveira, 196",
+                addressLocality: "Palhoça",
+                addressRegion: "SC",
+                postalCode: "88136-000",
+                addressCountry: "BR",
+              },
+              telephone: "+55 48 99646-1346",
+              sameAs: ["https://www.instagram.com/barbeariad.vini"],
+            }),
+          }}
+        />
         {children}
       </body>
     </html>
